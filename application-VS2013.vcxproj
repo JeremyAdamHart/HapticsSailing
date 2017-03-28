@@ -25,6 +25,7 @@
     <ClCompile Include="glSupport.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SimpleMaterial.cpp" />
     <ClCompile Include="TrackballCamera.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="SimpleGeometry.cpp" />
@@ -37,6 +38,7 @@
     <ClInclude Include="glSupport.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="SimpleMaterial.h" />
     <ClInclude Include="TrackballCamera.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="SimpleGeometry.h" />

@@ -15,6 +15,7 @@
 #include "Renderer.h"
 #include "TrackballCamera.h"
 #include "SimpleGeometry.h"
+#include "SimpleMaterial.h"
 //------------------------------------------------------------------------------
 using namespace chai3d;
 using namespace std;
@@ -235,9 +236,10 @@ int main(int argc, char* argv[])
 
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	SimpleGeometry waterGeometry(points.data(), points.size(), GL_PATCHES);
+	SimpleGeometry waterGeometry(points.data(), points.size(), GL_TRIANGLE_STRIP);
 	ToonWater waterMat;
-	Drawable water(mat4(), &waterMat, &waterGeometry);
+	SimpleMaterial mat;
+	Drawable water(mat4(), &mat, &waterGeometry);
 
 	checkGLErrors("Pre loop");
 

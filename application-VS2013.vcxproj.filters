@@ -46,6 +46,9 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleMaterial.cpp">
+      <Filter>Source Files\Materials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glSupport.h">
@@ -77,6 +80,9 @@
     </ClInclude>
     <ClInclude Include="Scene.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleMaterial.h">
+      <Filter>Source Files\Materials</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
