@@ -108,6 +108,8 @@ void updateHaptics(void);
 // this function closes the application
 void close(void);
 
+TrackballCamera* activeCamera;
+
 //==============================================================================
 /*
     TEMPLATE:    application.cpp
@@ -221,11 +223,11 @@ int main(int argc, char* argv[])
 	// SETUP
 	//--------------------------------------------------------------------------
 
-	float fov = 90.0;		//Degrees
+	float fov = 100.0;		//Degrees
 	mat4 projectionMatrix = perspectiveFov(fov, (float)width, (float)height, 0.01f, 100.f);
 	TrackballCamera cam(
 		vec3(0, 0, -1),		//Direction
-		vec3(0, 1, 10),		//Position
+		vec3(0, 0, 20),		//Position
 		projectionMatrix);
 
 	vector<vec3> points;
@@ -236,11 +238,11 @@ int main(int argc, char* argv[])
 
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	SimpleGeometry waterGeometry(points.data(), points.size(), GL_TRIANGLE_STRIP);
+	SimpleGeometry waterGeometry(points.data(), points.size(), GL_PATCHES);
 	ToonWater waterMat;
 	SimpleMaterial mat;
-	Drawable water(mat4(), &mat, &waterGeometry);
-
+	Drawable water(mat4(), &waterMat, &waterGeometry);
+	
 	checkGLErrors("Pre loop");
 
 
@@ -256,6 +258,15 @@ int main(int argc, char* argv[])
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		ris.draw(cam, &water);
+
+		//glUseProgram(0);
+
+	/*	glBegin(GL_TRIANGLE_FAN);
+		glVertex3f(0.0, 0.0, 0.0);
+		glVertex3f(0.5, 0.0, 0.0);
+		glVertex3f(0.5, 0.5, 0.0);
+		glVertex3f(0.0, 0.5, 0.0);
+		glEnd();*/
 
 		checkGLErrors("Finish draw");
 

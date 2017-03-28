@@ -25,4 +25,5 @@ public:
 	void trackballRight(float radians);
 	void zoom(float factor);
 	mat4 getCameraMatrix() const;
+	mat4 getProjectionMatrix() const;
 };

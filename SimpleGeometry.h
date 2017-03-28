@@ -3,7 +3,7 @@
 #include "GLGeometry.h"
 #include <glm/glm.hpp>
 //#include <glad/glad.h>
-#include <GL/glew.h>
+#include <chai3d.h>
 #include <GLFW/glfw3.h>
 
 using namespace glm;

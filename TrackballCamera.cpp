@@ -76,3 +76,8 @@ mat4 TrackballCamera::getCameraMatrix() const
 
 	return transpose(cameraRotation)*translation;
 }
+
+mat4 TrackballCamera::getProjectionMatrix() const
+{
+	return projection;
+}

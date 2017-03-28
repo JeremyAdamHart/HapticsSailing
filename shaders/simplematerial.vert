@@ -11,5 +11,5 @@ uniform mat4 modelview;
 void main()
 {
     // assign vertex position without modification
-    gl_Position = modelview_projection*vec4(VertexPosition, 1.0);sdfer
+    gl_Position = modelview_projection*vec4(VertexPosition, 1.0);
 }

@@ -51,7 +51,7 @@ void SimpleGeometry::loadGeometry(vec3 *positions, size_t elementNum)
 void SimpleGeometry::loadPositions(vec3 *positions, size_t numPositions, GLenum usage)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[POSITION]);
-	glBufferData(GL_ARRAY_BUFFER, numPositions, positions, usage);
+	glBufferData(GL_ARRAY_BUFFER, numPositions*sizeof(vec3), positions, usage);
 
 	checkGLErrors("SimpleGeometry::loadPositions");
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <GL/glew.h>
+#include <chai3d.h>
 #include <GLFW/glfw3.h>
 
 //All derived subclasses are singletons
