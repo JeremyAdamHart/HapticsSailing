@@ -17,8 +17,10 @@ string fileToString(const string &filename)
 		file.close();
 		return contents;
 	}
-	else
+	else{
+		cout << filename.c_str() << " not found" << endl;
 		return string();
+	}
 }
 
 GLuint createShader(const string &source, GLenum shaderType){
@@ -39,6 +41,7 @@ GLuint createShader(const string &source, GLenum shaderType){
 		string errorMessage(logSize, ' ');
 		glGetShaderInfoLog(shader, logSize, NULL, &errorMessage[0]);
 
+		cout << source << endl;
 		cout << "[Errors detected]" << endl << errorMessage.c_str() << endl;
 
 		glDeleteShader(shader);
@@ -60,6 +63,8 @@ GLuint createProgram(GLuint vertexShader, GLuint fragmentShader, GLuint tessCont
 	if (tessControlShader) glAttachShader(program, tessControlShader);
 	if (tessEvalShader) glAttachShader(program, tessEvalShader);
 	
+	glLinkProgram(program);
+
 	GLint isLinked = 0;
 	glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
 	if (isLinked == GL_FALSE)
@@ -70,7 +75,7 @@ GLuint createProgram(GLuint vertexShader, GLuint fragmentShader, GLuint tessCont
 		string errorMessage(logSize, ' ');
 		glGetProgramInfoLog(program, logSize, NULL, &errorMessage[0]);
 
-		cout << "[Errors detected]" << endl << errorMessage.c_str() << endl;
+		cout << "[Linking failed]" << endl << errorMessage.c_str() << endl;
 
 		glDeleteProgram(program);
 
@@ -92,7 +97,7 @@ bool checkGLErrors(string location){
 	bool error = false;
 	for (GLenum flag = glGetError(); flag != GL_NO_ERROR; flag = glGetError())
 	{
-		cout << "<" << location << ">" << endl;;
+		cout << "<" << location << ">: ";
 		switch (flag) {
 		case GL_INVALID_ENUM:
 			cout << "GL_INVALID_ENUM" << endl; break;

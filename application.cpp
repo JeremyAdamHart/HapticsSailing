@@ -195,6 +195,15 @@ int main(int argc, char* argv[])
     //--------------------------------------------------------------------------
 
 
+/*	while (true){
+		glClear(GL_COLOR_BUFFER_BIT);
+		glBegin(GL_POLYGON);
+		glVertex3f(0.0, 0.0, 0.0);
+		glVertex3f(0.5, 0.0, 0.0);
+		glVertex3f(0.5, 0.5, 0.0);
+		glVertex3f(0.0, 0.5, 0.0);
+		glEnd();
+	}*/
 
     //--------------------------------------------------------------------------
     // START SIMULATION
@@ -215,14 +224,16 @@ int main(int argc, char* argv[])
 	mat4 projectionMatrix = perspectiveFov(fov, (float)width, (float)height, 0.01f, 100.f);
 	TrackballCamera cam(
 		vec3(0, 0, -1),		//Direction
-		vec3(0, 1, 1),		//Position
+		vec3(0, 1, 10),		//Position
 		projectionMatrix);
 
 	vector<vec3> points;
-	points.push_back(vec3(-1, 0, 1));
-	points.push_back(vec3(1, 0, 1));
-	points.push_back(vec3(-1, 0, -1));
-	points.push_back(vec3(1, 0, -1));
+	points.push_back(vec3(-1, 1, 0));
+	points.push_back(vec3(1, 1, 0));
+	points.push_back(vec3(-1, -1, 0));
+	points.push_back(vec3(1, -1, 0));
+
+	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
 	SimpleGeometry waterGeometry(points.data(), points.size(), GL_PATCHES);
 	ToonWater waterMat;
@@ -240,7 +251,6 @@ int main(int argc, char* argv[])
     windowSizeCallback(window, width, height);
 
 	while (!glfwWindowShouldClose(window)){
-
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		ris.draw(cam, &water);
@@ -248,8 +258,8 @@ int main(int argc, char* argv[])
 		checkGLErrors("Finish draw");
 
 		glfwSwapBuffers(window);
+		glfwPollEvents();
 	}
-
 
     // close window
     glfwDestroyWindow(window);

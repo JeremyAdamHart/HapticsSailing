@@ -2,13 +2,14 @@
 
 // location indices for these attributes correspond to those specified in the
 // InitializeGeometry() function of the main program
-layout(location = 0) in vec2 VertexPosition;
+layout(location = 0) in vec3 VertexPosition;
 
-// output to be interpolated between vertices and passed to the fragment stage
-out vec3 tcColour;
+uniform mat4 modelview_projection;
+uniform mat4 modelview;
+
 
 void main()
 {
     // assign vertex position without modification
-    gl_Position = vec4(VertexPosition, 0.0, 1.0);
+    gl_Position = modelview_projection*vec4(VertexPosition, 1.0);
 }

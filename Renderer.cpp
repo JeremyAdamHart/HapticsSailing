@@ -67,11 +67,19 @@ void Renderer::draw(const Camera &cam, Drawable *object)
 
 	glUseProgram(material->getProgram());
 
+	checkGLErrors("glUseProgram");
+
+	geometry->bindGeometry();
+
 	object->loadUniforms(cam.getCameraMatrix(), cam.getProjectionMatrix());
+
+	checkGLErrors("loadUniforms");
 
 	if (geometry->usingDrawElements())
 		glDrawElements(geometry->getMode(), geometry->numElements(), GL_UNSIGNED_INT, 
 		(void*)(geometry->startIndex()*sizeof(unsigned int)));
+	else
+		glDrawArrays(geometry->getMode(), geometry->startIndex(), geometry->numElements());
 
-	glDrawArrays(geometry->getMode(), geometry->startIndex(), geometry->numElements());
+	checkGLErrors("Renderer::draw");
 }
