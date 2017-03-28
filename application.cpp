@@ -9,10 +9,16 @@
 //------------------------------------------------------------------------------
 //#include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "ToonWater.h"
+#include "Renderer.h"
+#include "TrackballCamera.h"
+#include "SimpleGeometry.h"
 //------------------------------------------------------------------------------
 using namespace chai3d;
 using namespace std;
+using namespace glm;
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -130,53 +136,15 @@ int main(int argc, char* argv[])
     // OPENGL - WINDOW DISPLAY
     //--------------------------------------------------------------------------
 
-    // initialize GLFW library
-    if (!glfwInit())
-    {
-        cout << "failed initialization" << endl;
-        cSleepMs(1000);
-        return 1;
-    }
+	Renderer ris;
 
-    // set error callback
-    glfwSetErrorCallback(errorCallback);
+	GLFWwindow *window = ris.createWindow();
 
-    // compute desired size of window
-    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    int w = 0.8 * mode->height;
-    int h = 0.5 * mode->height;
-    int x = 0.5 * (mode->width - w);
-    int y = 0.5 * (mode->height - h);
-
-    // set OpenGL version
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-
-    // set active stereo mode
-    if (stereoMode == C_STEREO_ACTIVE)
-    {
-        glfwWindowHint(GLFW_STEREO, GL_TRUE);
-    }
-    else
-    {
-        glfwWindowHint(GLFW_STEREO, GL_FALSE);
-    }
-
-    // create display context
-    window = glfwCreateWindow(w, h, "CHAI3D", NULL, NULL);
-    if (!window)
-    {
-        cout << "failed to create window" << endl;
-        cSleepMs(1000);
-        glfwTerminate();
-        return 1;
-    }
+	if (window == NULL)
+		return -1;
 
     // get width and height of window
     glfwGetWindowSize(window, &width, &height);
-
-    // set position of window
-    glfwSetWindowPos(window, x, y);
 
     // set key callback
     glfwSetKeyCallback(window, keyCallback);
@@ -195,16 +163,6 @@ int main(int argc, char* argv[])
 		cout << "Failed to initialize GLAD" << endl;
 		return -1;
 	}*/
-
-#ifdef GLEW_VERSION
-	// initialize GLEW library
-	if (glewInit() != GLEW_OK)
-	{
-		cout << "failed to initialize GLEW library" << endl;
-		glfwTerminate();
-		return 1;
-	}
-#endif
 
 
 
@@ -249,13 +207,48 @@ int main(int argc, char* argv[])
     // setup callback when application exits
     atexit(close);
 
+	//--------------------------------------------------------------------------
+	// SETUP
+	//--------------------------------------------------------------------------
+
+	float fov = 90.0;		//Degrees
+	mat4 projectionMatrix = perspectiveFov(fov, (float)width, (float)height, 0.01f, 100.f);
+	TrackballCamera cam(
+		vec3(0, 0, -1),		//Direction
+		vec3(0, 1, 1),		//Position
+		projectionMatrix);
+
+	vector<vec3> points;
+	points.push_back(vec3(-1, 0, 1));
+	points.push_back(vec3(1, 0, 1));
+	points.push_back(vec3(-1, 0, -1));
+	points.push_back(vec3(1, 0, -1));
+
+	SimpleGeometry waterGeometry(points.data(), points.size(), GL_PATCHES);
+	ToonWater waterMat;
+	Drawable water(mat4(), &waterMat, &waterGeometry);
+
+	checkGLErrors("Pre loop");
+
 
     //--------------------------------------------------------------------------
     // MAIN GRAPHIC LOOP
     //--------------------------------------------------------------------------
 
+
     // call window size callback at initialization
     windowSizeCallback(window, width, height);
+
+	while (!glfwWindowShouldClose(window)){
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		ris.draw(cam, &water);
+
+		checkGLErrors("Finish draw");
+
+		glfwSwapBuffers(window);
+	}
 
 
     // close window

@@ -11,6 +11,9 @@
     <Filter Include="Source Files\Geometry">
       <UniqueIdentifier>{8fe14bab-28f9-4100-9d59-384a4eb39119}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Camera">
+      <UniqueIdentifier>{785d8746-02aa-4353-a6fa-8901cf764cb0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp">
@@ -34,6 +37,15 @@
     <ClCompile Include="Drawable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="TrackballCamera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glSupport.h">
@@ -55,6 +67,15 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Drawable.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Source Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="TrackballCamera.h">
+      <Filter>Source Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,4 +1,5 @@
 #include "Drawable.h"
+#include "glSupport.h"
 
 using namespace glm;
 
@@ -14,4 +15,6 @@ void Drawable::loadUniforms(const mat4 &camera_matrix, const mat4 &projectionMat
 	glUniformMatrix4fv(uniformLocation, 1, false, &modelview_matrix[0][0]);
 
 	material->loadUniforms();
+
+	checkGLErrors("Drawable::loadUniforms");
 }

@@ -11,6 +11,7 @@ using namespace glm;
 class SimpleGeometry : public GLGeometryContainer {
 	GLuint vao;
 	size_t bufferSize;
+	GLenum mode;
 
 	enum{ POSITION = 0, COUNT };
 	GLuint vbo[COUNT];
@@ -18,8 +19,8 @@ class SimpleGeometry : public GLGeometryContainer {
 	bool initializeVAO();
 
 public:
-	SimpleGeometry();
-	SimpleGeometry(vec3 *positions, size_t elementNum);
+	SimpleGeometry(GLenum mode=GL_TRIANGLES);
+	SimpleGeometry(vec3 *positions, size_t elementNum, GLenum mode=GL_TRIANGLES);
 
 	void loadGeometry(vec3 *positions, size_t elementNum);
 
@@ -28,11 +29,15 @@ public:
 	virtual void bindGeometry();
 	virtual int startIndex() { return 0; }
 	virtual int numElements() { return bufferSize; }
+	virtual GLenum getMode() { return mode; }
+
+	virtual bool usingDrawElements() { return false; }
 };
 
 class SimpleTexGeometry : public GLGeometryContainer {
 	GLuint vao;
 	size_t bufferSize;
+	GLenum mode;
 	
 	enum{POSITION=0, TEXCOORD, COUNT};
 	GLuint vbo[COUNT];
@@ -40,8 +45,8 @@ class SimpleTexGeometry : public GLGeometryContainer {
 	bool initializeVAO();
 
 public:
-	SimpleTexGeometry();
-	SimpleTexGeometry(vec3 *positions, vec2 *texCoords, size_t elementNum);
+	SimpleTexGeometry(GLenum mode=GL_TRIANGLES);
+	SimpleTexGeometry(vec3 *positions, vec2 *texCoords, size_t elementNum, GLenum mode=GL_TRIANGLES);
 
 	void loadGeometry(vec3 *positions, vec2 *texCoords, size_t elementNum);
 
@@ -51,7 +56,8 @@ public:
 	virtual void bindGeometry();
 	virtual int startIndex() { return 0; }
 	virtual int numElements() { return bufferSize; }
+	virtual GLenum getMode() { return mode; }
 
-	virtual SimpleTexGeometry* copy();
+	virtual bool usingDrawElements() { return false; }
 };
 

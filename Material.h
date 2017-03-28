@@ -12,5 +12,6 @@ public:
 	virtual void loadUniforms();
 	virtual Material* copy();		//Creates copy on heap
 
+
 	void deleteProgram();
 };

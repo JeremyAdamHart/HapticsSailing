@@ -47,6 +47,8 @@ GLuint createShader(const string &source, GLenum shaderType){
 	}
 	else
 		return shader;
+
+	checkGLErrors("createShader");
 }
 
 GLuint createProgram(GLuint vertexShader, GLuint fragmentShader, GLuint tessControlShader, GLuint tessEvalShader)
@@ -82,6 +84,7 @@ GLuint createProgram(GLuint vertexShader, GLuint fragmentShader, GLuint tessCont
 
 	return program;
 
+	checkGLErrors("createProgram");
 }
 
 
