@@ -109,6 +109,7 @@ void updateHaptics(void);
 void close(void);
 
 TrackballCamera* activeCamera;
+bool leftMouseDown = false;
 
 //==============================================================================
 /*
@@ -351,6 +352,35 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
         mirroredDisplay = !mirroredDisplay;
         camera->setMirrorVertical(mirroredDisplay);
     }
+}
+
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT){
+		if (action == GLFW_RELEASE)
+			leftMouseDown = false;
+		else
+			leftMouseDown = true;
+		
+	}
+
+}
+
+void mousePositionCallback(GLFWwindow *window, double xpos, double ypos)
+{
+	static vec2 mousePos;
+
+	vec2 newPos = vec2(xpos / double(width), ypos / double(height))*2.f - vec2(1, 1);
+
+	vec2 diff = newPos - mousePos;
+
+	if (leftMouseDown){
+		activeCamera->trackballRight(diff.x);
+		activeCamera->trackballUp(diff.y);
+	}
+
+	mousePos = newPos;
+
 }
 
 //------------------------------------------------------------------------------
