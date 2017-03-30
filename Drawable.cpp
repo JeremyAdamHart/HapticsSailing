@@ -7,14 +7,14 @@ void Drawable::loadUniforms(const mat4 &camera_matrix, const mat4 &projectionMat
 {
 	glUseProgram(material->getProgram());
 
-	mat4 modelview_projection = projectionMatrix*camera_matrix*modelview_matrix;
-	GLint uniformLocation = glGetUniformLocation(material->getProgram(), "modelview_projection");
+	mat4 viewProjectionMatrix = projectionMatrix*camera_matrix;
+	GLint uniformLocation = glGetUniformLocation(material->getProgram(), "view_projection_matrix");
 	if (uniformLocation != -1)
-		glUniformMatrix4fv(uniformLocation, 1, false, &modelview_projection[0][0]);
+		glUniformMatrix4fv(uniformLocation, 1, false, &viewProjectionMatrix[0][0]);
 
-	uniformLocation = glGetUniformLocation(material->getProgram(), "modelview");
+	uniformLocation = glGetUniformLocation(material->getProgram(), "model_matrix");
 	if (uniformLocation != -1)
-		glUniformMatrix4fv(uniformLocation, 1, false, &modelview_matrix[0][0]);
+		glUniformMatrix4fv(uniformLocation, 1, false, &model_matrix[0][0]);
 
 	material->loadUniforms();
 

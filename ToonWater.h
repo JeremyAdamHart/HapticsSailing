@@ -3,12 +3,16 @@
 
 #include "glSupport.h"
 #include "Material.h"
+#include "WaveFunction.h"
 
 class ToonWater : public Material{
 	static GLint program;
 	void initializeShader();
 public:
-	ToonWater();
+	vector<WaveFunction> *waves;
+	float *timeElapsed;
+
+	ToonWater(vector<WaveFunction> *waves=nullptr, float *timeElapsed=nullptr);
 
 	virtual GLint getProgram();
 	virtual void loadUniforms();

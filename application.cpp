@@ -99,6 +99,9 @@ void errorCallback(int error, const char* a_description);
 // callback when a key is pressed
 void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, int a_mods);
 
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+void mousePositionCallback(GLFWwindow *window, double xpos, double ypos);
+
 // this function renders the scene
 void updateGraphics(void);
 
@@ -108,7 +111,7 @@ void updateHaptics(void);
 // this function closes the application
 void close(void);
 
-TrackballCamera* activeCamera;
+TrackballCamera* activeCamera = NULL;
 bool leftMouseDown = false;
 
 //==============================================================================
@@ -155,6 +158,9 @@ int main(int argc, char* argv[])
 
     // set resize callback
     glfwSetWindowSizeCallback(window, windowSizeCallback);
+
+	glfwSetMouseButtonCallback(window, mouseButtonCallback);
+	glfwSetCursorPosCallback(window, mousePositionCallback);
 
     // set current display context
     glfwMakeContextCurrent(window);
@@ -231,21 +237,31 @@ int main(int argc, char* argv[])
 		vec3(0, 0, 20),		//Position
 		projectionMatrix);
 
+	activeCamera = &cam;
+
 	vector<vec3> points;
-	points.push_back(vec3(-1, 1, 0));
+/*	points.push_back(vec3(-1, 1, 0));
 	points.push_back(vec3(1, 1, 0));
 	points.push_back(vec3(-1, -1, 0));
-	points.push_back(vec3(1, -1, 0));
+	points.push_back(vec3(1, -1, 0));*/
+
+	points.push_back(vec3(-1, 0, 1));
+	points.push_back(vec3(1, 0, 1));
+	points.push_back(vec3(-1, 0, -1));
+	points.push_back(vec3(1, 0, -1));
 
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	SimpleGeometry waterGeometry(points.data(), points.size(), GL_PATCHES);
 	ToonWater waterMat;
 	SimpleMaterial mat;
 	Drawable water(mat4(), &waterMat, &waterGeometry);
+
+	water.model_matrix = mat4()*5.f;
 	
 	checkGLErrors("Pre loop");
-
 
     //--------------------------------------------------------------------------
     // MAIN GRAPHIC LOOP
@@ -370,11 +386,11 @@ void mousePositionCallback(GLFWwindow *window, double xpos, double ypos)
 {
 	static vec2 mousePos;
 
-	vec2 newPos = vec2(xpos / double(width), ypos / double(height))*2.f - vec2(1, 1);
+	vec2 newPos = vec2(xpos / double(width), -ypos / double(height))*2.f - vec2(1, -1);
 
 	vec2 diff = newPos - mousePos;
 
-	if (leftMouseDown){
+	if (leftMouseDown && activeCamera != NULL){
 		activeCamera->trackballRight(diff.x);
 		activeCamera->trackballUp(diff.y);
 	}
