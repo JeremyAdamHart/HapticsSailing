@@ -16,6 +16,7 @@
 #include "TrackballCamera.h"
 #include "SimpleGeometry.h"
 #include "SimpleMaterial.h"
+#include <random>
 //------------------------------------------------------------------------------
 using namespace chai3d;
 using namespace std;
@@ -113,6 +114,8 @@ void close(void);
 
 TrackballCamera* activeCamera = NULL;
 bool leftMouseDown = false;
+
+float rand01() { return float(rand()) / float(RAND_MAX); }
 
 //==============================================================================
 /*
@@ -254,8 +257,29 @@ int main(int argc, char* argv[])
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+	srand(time(0));
+
+	float posRange = 10.f;
+	float heightRange = 0.f;
+	float wavelengthRange = 5.f;
+	float speedRange = 30.f;
+
+	vector<WaveFunction> waves;
+
+	//Generate wind directions
+	for (int i = 0; i < MAX_WAVE_NUMBER; i++){
+		waves.push_back(WaveFunction(
+			vec2(2.f*rand01() - 1.f, 2.f*rand01()- 1.f),
+			vec2(rand01()*2.f - 1.f, rand01()*2.f - 1.f)*posRange,
+			rand01()*wavelengthRange,
+			rand01()*speedRange,
+			rand01()*heightRange));
+	}
+
+	float timeElapsed = 0.f;
+
 	SimpleGeometry waterGeometry(points.data(), points.size(), GL_PATCHES);
-	ToonWater waterMat;
+	ToonWater waterMat(&waves, &timeElapsed);
 	SimpleMaterial mat;
 	Drawable water(mat4(), &waterMat, &waterGeometry);
 
@@ -275,6 +299,8 @@ int main(int argc, char* argv[])
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		ris.draw(cam, &water);
+
+		//timeElapsed += 1.f / 60.f;
 
 		//glUseProgram(0);
 

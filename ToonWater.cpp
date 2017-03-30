@@ -3,8 +3,6 @@
 #include <cstdio>
 #include <cstdarg>
 
-#define MAX_WAVE_NUMBER 10
-
 GLint ToonWater::program = 0;
 
 using namespace glm;

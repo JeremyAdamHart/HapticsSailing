@@ -3,7 +3,7 @@
 using namespace glm;
 
 WaveFunction::WaveFunction(glm::vec2 dir, glm::vec2 origin, float wavelength, float speed, float height) :
-	dir(dir), origin(origin), wavelength(wavelength), speed(speed), height(height) {}
+	dir(normalize(dir)), origin(origin), wavelength(wavelength), speed(speed), height(height) {}
 
 float WaveFunction::f(vec2 pos, float t) {
 	return height*sin(dot(dir, (pos - origin)) / (2.f*M_PI*wavelength) + speed*t / (2.f*M_PI));
