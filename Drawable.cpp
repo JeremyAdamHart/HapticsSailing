@@ -3,7 +3,8 @@
 
 using namespace glm;
 
-void Drawable::loadUniforms(const mat4 &camera_matrix, const mat4 &projectionMatrix)
+void Drawable::loadUniforms(const mat4 &camera_matrix, const mat4 &projectionMatrix, 
+	const vec3 &viewPosition)
 {
 	glUseProgram(material->getProgram());
 
@@ -17,6 +18,9 @@ void Drawable::loadUniforms(const mat4 &camera_matrix, const mat4 &projectionMat
 		glUniformMatrix4fv(uniformLocation, 1, false, &model_matrix[0][0]);
 
 	material->loadUniforms();
+
+	uniformLocation = glGetUniformLocation(material->getProgram(), "camera_position");
+	glUniform3f(uniformLocation, viewPosition.x, viewPosition.y, viewPosition.z);
 
 	checkGLErrors("Drawable::loadUniforms");
 }

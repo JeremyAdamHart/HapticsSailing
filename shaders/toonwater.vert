@@ -4,12 +4,11 @@
 // InitializeGeometry() function of the main program
 layout(location = 0) in vec3 VertexPosition;
 
-uniform mat4 modelview_projection;
-uniform mat4 modelview;
+uniform mat4 model_matrix;
 
 
 void main()
 {
     // assign vertex position without modification
-    gl_Position = modelview_projection*vec4(VertexPosition, 1.0);
+    gl_Position = model_matrix*vec4(VertexPosition, 1.0);
 }

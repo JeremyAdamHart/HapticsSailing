@@ -26,4 +26,5 @@ public:
 	void zoom(float factor);
 	mat4 getCameraMatrix() const;
 	mat4 getProjectionMatrix() const;
+	vec3 getPosition() const;
 };

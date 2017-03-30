@@ -71,7 +71,7 @@ void Renderer::draw(const Camera &cam, Drawable *object)
 
 	geometry->bindGeometry();
 
-	object->loadUniforms(cam.getCameraMatrix(), cam.getProjectionMatrix());
+	object->loadUniforms(cam.getCameraMatrix(), cam.getProjectionMatrix(), cam.getPosition());
 
 	checkGLErrors("loadUniforms");
 

@@ -30,6 +30,7 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="SimpleGeometry.cpp" />
     <ClCompile Include="ToonWater.cpp" />
+    <ClCompile Include="WaveFunction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -43,6 +44,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="SimpleGeometry.h" />
     <ClInclude Include="ToonWater.h" />
+    <ClInclude Include="WaveFunction.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>application-GLFW</ProjectName>

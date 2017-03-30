@@ -114,6 +114,7 @@ void close(void);
 
 TrackballCamera* activeCamera = NULL;
 bool leftMouseDown = false;
+bool rightMouseDown = false;
 
 float rand01() { return float(rand()) / float(RAND_MAX); }
 
@@ -255,14 +256,16 @@ int main(int argc, char* argv[])
 
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glEnable(GL_DEPTH_TEST);
+
+//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	srand(time(0));
 
-	float posRange = 10.f;
-	float heightRange = 0.f;
-	float wavelengthRange = 5.f;
-	float speedRange = 30.f;
+	float posRange = 20.f;
+	float heightRange = 1.f;
+	float wavelengthRange = 20.f;
+	float speedRange = 1.f;
 
 	vector<WaveFunction> waves;
 
@@ -283,7 +286,7 @@ int main(int argc, char* argv[])
 	SimpleMaterial mat;
 	Drawable water(mat4(), &waterMat, &waterGeometry);
 
-	water.model_matrix = mat4()*5.f;
+	water.model_matrix = mat4()*10.f;
 	
 	checkGLErrors("Pre loop");
 
@@ -300,16 +303,7 @@ int main(int argc, char* argv[])
 
 		ris.draw(cam, &water);
 
-		//timeElapsed += 1.f / 60.f;
-
-		//glUseProgram(0);
-
-	/*	glBegin(GL_TRIANGLE_FAN);
-		glVertex3f(0.0, 0.0, 0.0);
-		glVertex3f(0.5, 0.0, 0.0);
-		glVertex3f(0.5, 0.5, 0.0);
-		glVertex3f(0.0, 0.5, 0.0);
-		glEnd();*/
+		timeElapsed += 1.f / 60.f;
 
 		checkGLErrors("Finish draw");
 
@@ -405,6 +399,13 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 			leftMouseDown = true;
 		
 	}
+	if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+		if (action == GLFW_RELEASE)
+			rightMouseDown = false;
+		else
+			rightMouseDown = true;
+
+	}
 
 }
 
@@ -421,8 +422,12 @@ void mousePositionCallback(GLFWwindow *window, double xpos, double ypos)
 		activeCamera->trackballUp(diff.y);
 	}
 
-	mousePos = newPos;
+	if (rightMouseDown && activeCamera != NULL) {
+		float zoomFactor = 0.5f*pow(2.f, diff.y + 1.f);
+		activeCamera->zoom(zoomFactor);
+	}
 
+	mousePos = newPos;
 }
 
 //------------------------------------------------------------------------------

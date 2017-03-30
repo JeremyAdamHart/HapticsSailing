@@ -18,5 +18,6 @@ public:
 	GLGeometryContainer *getGeometryContainer(){ return geometry; }
 	void setGeometryContainer(GLGeometryContainer* newGeometry) { geometry = newGeometry; }
 
-	virtual void loadUniforms(const glm::mat4 &camera_matrix, const glm::mat4 &projection_matrix);
+	virtual void loadUniforms(const glm::mat4 &camera_matrix, const glm::mat4 &projection_matrix, 
+		const glm::vec3 &viewPosition);
 };

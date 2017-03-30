@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 //#include <glad/glad.h>
 
@@ -35,6 +36,51 @@ GLuint createShader(const string &source, GLenum shaderType){
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
 	if (success == GL_FALSE){
+		int logSize = 0;
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logSize);
+
+		string errorMessage(logSize, ' ');
+		glGetShaderInfoLog(shader, logSize, NULL, &errorMessage[0]);
+
+		cout << source << endl;
+		cout << "[Errors detected]" << endl << errorMessage.c_str() << endl;
+
+		glDeleteShader(shader);
+
+		return 0;
+	}
+	else
+		return shader;
+
+	checkGLErrors("createShader");
+}
+
+GLuint createShader(const string &source, const string &defines, GLenum shaderType) {
+
+	GLuint shader = glCreateShader(shaderType);
+
+	size_t index = source.find('\n');
+
+	if (index == string::npos) {
+		glDeleteShader(shader);
+		return 0;
+	}
+	
+	string version = source.substr(0, index+1);
+	string content = source.substr(index + 1);
+
+	string newSource = version + defines + content;
+
+//	cout << newSource.c_str() << endl;
+
+	const GLchar *source_ptr = newSource.c_str();
+	glShaderSource(shader, 1, &source_ptr, NULL);
+	glCompileShader(shader);
+
+	GLint success = 0;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+
+	if (success == GL_FALSE) {
 		int logSize = 0;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logSize);
 

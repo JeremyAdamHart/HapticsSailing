@@ -5,7 +5,7 @@
 #include "Material.h"
 #include "WaveFunction.h"
 
-#define MAX_WAVE_NUMBER 4
+#define MAX_WAVE_NUMBER 5
 
 class ToonWater : public Material{
 	static GLint program;

@@ -81,3 +81,8 @@ mat4 TrackballCamera::getProjectionMatrix() const
 {
 	return projection;
 }
+
+vec3 TrackballCamera::getPosition() const
+{
+	return pos;
+}

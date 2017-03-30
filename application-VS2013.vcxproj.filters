@@ -49,6 +49,9 @@
     <ClCompile Include="SimpleMaterial.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
+    <ClCompile Include="WaveFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glSupport.h">
@@ -83,6 +86,9 @@
     </ClInclude>
     <ClInclude Include="SimpleMaterial.h">
       <Filter>Source Files\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="WaveFunction.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

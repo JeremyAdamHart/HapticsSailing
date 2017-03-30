@@ -30,8 +30,8 @@ void ToonWater::initializeShader()
 	GLuint tessControlShader = createShader(fileToString("shaders/toonwater.tesc"), 
 										GL_TESS_CONTROL_SHADER);
 	cout << "Compiling toonwater.tese" << endl;
-	GLuint tessEvalShader = createShader(fileToString("shaders/toonwater.tese") 
-										+ waveNumberDefine, 
+	GLuint tessEvalShader = createShader(fileToString("shaders/toonwater.tese"),
+										waveNumberDefine,
 										GL_TESS_EVALUATION_SHADER);
 	program = createProgram(vertexShader, fragmentShader, tessControlShader, tessEvalShader);
 }
@@ -88,11 +88,13 @@ void ToonWater::loadUniforms()
 		glUniform1f(uniformLocation, wave->speed);
 
 		uniformLocation = glGetUniformLocation(program, str("waves[%d].height", i).c_str());
-		glUniform1f(uniformLocation, wave->speed);
+		glUniform1f(uniformLocation, wave->height);
 	}
 
-	uniformLocation = glGetUniformLocation(program, "timeElapsed");
-	glUniform1f(uniformLocation, *timeElapsed);
+	float t = *timeElapsed;
+
+	uniformLocation = glGetUniformLocation(program, "elapsedTime");
+	glUniform1f(uniformLocation, t);
 
 }
 

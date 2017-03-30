@@ -1,9 +1,13 @@
 #include "WaveFunction.h"
+#include <stdio.h>
 
 using namespace glm;
 
-WaveFunction::WaveFunction(glm::vec2 dir, glm::vec2 origin, float wavelength, float speed, float height) :
-	dir(normalize(dir)), origin(origin), wavelength(wavelength), speed(speed), height(height) {}
+WaveFunction::WaveFunction(glm::vec2 _dir, glm::vec2 origin, float wavelength, float speed, float height) :
+	dir(normalize(_dir)), origin(origin), wavelength(wavelength), speed(speed), height(height) {
+	printf("Dir (%f, %f)\nOrigin(%f, %f)\nWavelength %f\nSpeed %f\nHeight %f\n-----\n",
+		dir.x, dir.y, origin.x, origin.y, wavelength, speed, height);
+}
 
 float WaveFunction::f(vec2 pos, float t) {
 	return height*sin(dot(dir, (pos - origin)) / (2.f*M_PI*wavelength) + speed*t / (2.f*M_PI));
