@@ -10,7 +10,7 @@ WaveFunction::WaveFunction(glm::vec2 _dir, glm::vec2 origin, float wavelength, f
 }
 
 float WaveFunction::f(vec2 pos, float t) {
-	return height*sin(dot(dir, (pos - origin)) / (2.f*M_PI*wavelength) + speed*t / (2.f*M_PI));
+	return height*sin(2.f*M_PI*dot(dir, (pos - origin)) / (wavelength)+speed*t*(2.f*M_PI));
 }
 
 vec3 WaveFunction::df(vec2 pos, float t) {

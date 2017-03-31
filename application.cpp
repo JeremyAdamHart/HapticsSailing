@@ -214,17 +214,6 @@ int main(int argc, char* argv[])
     // WIDGETS
     //--------------------------------------------------------------------------
 
-
-/*	while (true){
-		glClear(GL_COLOR_BUFFER_BIT);
-		glBegin(GL_POLYGON);
-		glVertex3f(0.0, 0.0, 0.0);
-		glVertex3f(0.5, 0.0, 0.0);
-		glVertex3f(0.5, 0.5, 0.0);
-		glVertex3f(0.0, 0.5, 0.0);
-		glEnd();
-	}*/
-
     //--------------------------------------------------------------------------
     // START SIMULATION
     //--------------------------------------------------------------------------
@@ -241,7 +230,7 @@ int main(int argc, char* argv[])
 	//--------------------------------------------------------------------------
 
 	float fov = 100.0;		//Degrees
-	mat4 projectionMatrix = perspectiveFov(fov, (float)width, (float)height, 0.01f, 100.f);
+	mat4 projectionMatrix = perspectiveFov(fov, (float)width, (float)height, 0.01f, 1000.f);
 	TrackballCamera cam(
 		vec3(0, 0, -1),		//Direction
 		vec3(0, 0, 20),		//Position
@@ -269,26 +258,39 @@ int main(int argc, char* argv[])
 	MeshInfoLoader cubeMesh;
 	cubeMesh.loadModel("models/cube.obj");
 
+	float cWidth = 3.f;
+	float cHeight = 1.f;
+	float cDepth = 3.f;
+	mat4 cScale = scaleMatrix(vec3(cWidth*0.5f, cHeight*0.5f, cDepth*0.5f));
+	mat3 cScale3 = toMat3(cScale);
+
+	for (int i = 0; i < cubeMesh.vertices.size(); i++){
+		cubeMesh.vertices[i] = cScale3*cubeMesh.vertices[i];
+	}
+
 	ElementGeometry cubeContainer(cubeMesh.vertices.data(), cubeMesh.normals.data(), 
 					cubeMesh.uvs.data(), cubeMesh.indices.data(), cubeMesh.vertices.size(), cubeMesh.indices.size(), GL_TRIANGLES);
 	TorranceSparrow cubeMat;
-	Drawable cube(translateMatrix(vec3(0, 10.f, 0)), &cubeMat, &cubeContainer);
+	Drawable cube(translateMatrix(vec3(0, 5.f, 0)), &cubeMat, &cubeContainer);
 
-	float mass = 10.0;
-	mat3 I = mass/12.f*mat3(vec3(8.f, 0, 0),
-		vec3(0, 8.f, 0),
-		vec3(0, 0, 8.f));
+	float mass = 10.f;
+	mat3 I = mass/12.f*mat3(vec3(cHeight*cHeight + cDepth*cDepth, 0, 0),
+		vec3(0, cWidth*cWidth + cDepth*cDepth, 0),
+		vec3(0, 0, cWidth*cWidth + cHeight*cHeight));
 	RigidBody physicsCube(mass, I);
-	physicsCube.p = vec3(0, 10.f, 0);
+	physicsCube.p = vec3(0, 5.f, 0);
+	physicsCube.omega = vec3(1, 1, 0);
 
-	vec3 cubePoints[] = { vec3(1, 1, 1),
-		vec3(1, 1, -1),
-		vec3(1, -1, 1),
-		vec3(1, -1, -1),
-		vec3(-1, 1, 1),
-		vec3(-1, 1, -1),
-		vec3(-1, -1, 1),
-		vec3(-1, -1, -1) };
+
+	vec3 cubePoints[] = { 
+		cScale3*vec3(1, 1, 1),
+		cScale3*vec3(1, 1, -1),
+		cScale3*vec3(1, -1, 1),
+		cScale3*vec3(1, -1, -1),
+		cScale3*vec3(-1, 1, 1),
+		cScale3*vec3(-1, 1, -1),
+		cScale3*vec3(-1, -1, 1),
+		cScale3*vec3(-1, -1, -1) };
 //	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	srand(time(0));
@@ -303,10 +305,11 @@ int main(int argc, char* argv[])
 	//Generate wind directions
 	for (int i = 0; i < MAX_WAVE_NUMBER; i++){
 		waves.push_back(WaveFunction(
-			vec2(2.f*rand01() - 1.f, 2.f*rand01()- 1.f),
+			vec2(2.f*rand01() - 1.f, 2.f*rand01() - 1.f),
 			vec2(rand01()*2.f - 1.f, rand01()*2.f - 1.f)*posRange,
-			rand01()*wavelengthRange+3.0f,
+			rand01()*wavelengthRange + 3.0f,
 			rand01()*speedRange + 0.2f,
+		//	0.f));	
 			rand01()*heightRange));
 	}
 
@@ -330,6 +333,8 @@ int main(int argc, char* argv[])
     // call window size callback at initialization
     windowSizeCallback(window, width, height);
 
+	glClearColor(0.6f, 0.8f, 1.0f, 1.f);
+
 	while (!glfwWindowShouldClose(window)){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -341,12 +346,15 @@ int main(int argc, char* argv[])
 				height += waves[j].f(vec2(point.x, point.z), timeElapsed);
 			}
 
-			float k = 30;
-			float diff = height - point.y;
+			float k = 1000;
+			float diff = std::min(height - point.y, 2.f);
+			printf("Diff = %f\n", diff);
 			if (diff > 0)
 				physicsCube.addForce(vec3(0, k*diff, 0), point);
-
 		}
+
+		physicsCube.force += -physicsCube.v*DAMPING_LINEAR + physicsCube.mass*GRAVITY;
+		physicsCube.torque -= physicsCube.omega*DAMPING_ANGULAR;
 
 		physicsCube.resolveForces(1.f / 60.f);
 		cube.model_matrix = physicsCube.matrix();

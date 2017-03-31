@@ -14,3 +14,23 @@ mat4 translateMatrix(vec3 pos){
 		vec4(0, 0, 1, 0),
 		vec4(pos, 1));
 }
+
+glm::mat4 scaleMatrix(vec3 scale){
+	return mat4(
+		vec4(scale.x, 0, 0, 0),
+		vec4(0, scale.y, 0, 0),
+		vec4(0, 0, scale.z, 0),
+		vec4(0, 0, 0, 1.f));
+}
+
+glm::vec3 toVec3(vec4 v){
+	return vec3(v.x, v.y, v.z);
+}
+
+glm::mat3 toMat3(mat4 m){
+	return mat3(
+		toVec3(m[0]),
+		toVec3(m[1]),
+		toVec3(m[2])
+		);
+}

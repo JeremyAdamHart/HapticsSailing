@@ -14,8 +14,8 @@ vec3 lightPos = vec3(10.0, 10.0, 10.0);
 float ks = 0.5;
 float kd = 0.4;
 float alpha = 5.0;
-float ka = 0.3;
-const vec3 COLOR = vec3(0.1, 0.3, 1.0);
+float ka = 0.6;
+const vec3 COLOR = vec3(0.1, 0.7, 1.0);
 
 const float WIDTH = 0.5;
 

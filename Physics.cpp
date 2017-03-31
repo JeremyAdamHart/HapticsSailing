@@ -3,10 +3,6 @@
 
 using namespace glm;
 
-const float DAMPING_LINEAR = 2.0f;
-const float DAMPING_ANGULAR = 0.01f;
-const vec3 GRAVITY(0, -9.81, 0);
-
 RigidBody::RigidBody(float mass, mat3 inertialTensor) :force(0.f), torque(0.f), p(0.f), v(0.f), 
 	mass(mass), q(quat()), omega(0.f), I(inertialTensor), Iinv(inverse(inertialTensor))
 {
@@ -24,13 +20,15 @@ void RigidBody::resolveForces(float dt){
 	printf("Force(%f, %f, %f)\n", force.x, force.y, force.z);
 
 	//Linear integration
-	v += ((force - v*DAMPING_LINEAR)/ mass + GRAVITY)*dt;
+	v += force/mass*dt;
 	p += v*dt;
+
+//	printf("V(%f, %f, %f)\n", v.x, v.y, v.z);
 
 	//Rotational integration
 	mat3 IinvWorld = mat3_cast(q)*Iinv*transpose(mat3_cast(q));
 	vec3 ddt_omega = IinvWorld*torque;
-	omega += (ddt_omega - DAMPING_ANGULAR*omega)*dt;
+	omega += ddt_omega*dt;
 	quat omegaQ (0, omega.x, omega.y, omega.z);
 
 	q += dt*0.5f*omegaQ*q;
