@@ -75,6 +75,7 @@ void Renderer::draw(const Camera &cam, Drawable *object)
 
 	checkGLErrors("loadUniforms");
 
+	int index = geometry->startIndex()*sizeof(unsigned int);
 	int number = geometry->numElements();
 
 	if (geometry->usingDrawElements())
