@@ -20,12 +20,12 @@ struct WaveFunction
 uniform WaveFunction waves [MAX_WAVE_NUMBER];
 
 float f(WaveFunction w, vec2 pos, float t){
-	float falloff = clamp(((50.0*w.speed) - distance(pos, w.origin))/(w.speed*50.0), 0, 1);
+	float falloff = 1.0;	//clamp(((50.0*w.speed) - distance(pos, w.origin))/(w.speed*50.0), 0, 1);
 	return falloff*w.height*sin(2.f*M_PI*dot(w.dir, (pos - w.origin)) / (w.wavelength) + w.speed*t*2.f*M_PI);
 }
 
 vec3 df(WaveFunction w, vec2 pos, float t) {
-	float falloff = clamp((50.0*w.speed - distance(pos, w.origin))/(w.speed*50.0), 0, 1);
+	float falloff = 1.0;	//clamp((50.0*w.speed - distance(pos, w.origin))/(w.speed*50.0), 0, 1);
 	float cosValue = falloff*cos(2.f*M_PI*dot(w.dir, (pos - w.origin)) / (w.wavelength) + w.speed*t*2.f*M_PI);
 	vec3 df_dx = vec3(
 		1, 

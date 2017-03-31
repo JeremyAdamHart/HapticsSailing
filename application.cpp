@@ -16,6 +16,10 @@
 #include "TrackballCamera.h"
 #include "SimpleGeometry.h"
 #include "SimpleMaterial.h"
+#include "MeshInfoLoader.h"
+#include "TorranceSparrow.h"
+#include "ElementGeometry.h"
+
 #include <random>
 //------------------------------------------------------------------------------
 using namespace chai3d;
@@ -257,15 +261,20 @@ int main(int argc, char* argv[])
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+
+	//Import cube
+	MeshInfoLoader cubeMesh;
+	cubeMesh.loadModel("models/cube.obj");
 
 //	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	srand(time(0));
 
 	float posRange = 20.f;
-	float heightRange = 1.f;
+	float heightRange = 0.5f;
 	float wavelengthRange = 20.f;
-	float speedRange = 1.f;
+	float speedRange = 0.8f;
 
 	vector<WaveFunction> waves;
 
@@ -274,8 +283,8 @@ int main(int argc, char* argv[])
 		waves.push_back(WaveFunction(
 			vec2(2.f*rand01() - 1.f, 2.f*rand01()- 1.f),
 			vec2(rand01()*2.f - 1.f, rand01()*2.f - 1.f)*posRange,
-			rand01()*wavelengthRange,
-			rand01()*speedRange,
+			rand01()*wavelengthRange+3.0f,
+			rand01()*speedRange + 0.2f,
 			rand01()*heightRange));
 	}
 

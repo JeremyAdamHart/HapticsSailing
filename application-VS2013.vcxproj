@@ -22,10 +22,13 @@
     <ClCompile Include="application.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Drawable.cpp" />
+    <ClCompile Include="ElementGeometry.cpp" />
     <ClCompile Include="glSupport.cpp" />
     <ClCompile Include="Material.cpp" />
+    <ClCompile Include="MeshInfoLoader.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SimpleMaterial.cpp" />
+    <ClCompile Include="TorranceSparrow.cpp" />
     <ClCompile Include="TrackballCamera.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="SimpleGeometry.cpp" />
@@ -35,11 +38,14 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Drawable.h" />
+    <ClInclude Include="ElementGeometry.h" />
     <ClInclude Include="GLGeometry.h" />
     <ClInclude Include="glSupport.h" />
     <ClInclude Include="Material.h" />
+    <ClInclude Include="MeshInfoLoader.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SimpleMaterial.h" />
+    <ClInclude Include="TorranceSparrow.h" />
     <ClInclude Include="TrackballCamera.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="SimpleGeometry.h" />
@@ -134,7 +140,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>glfw.lib;OpenGL32.lib;glu32.lib;chai3d.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw.lib;OpenGL32.lib;glu32.lib;chai3d.lib;glew32.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(ProjectDir)\lib;../../lib/$(Configuration)/$(Platform);../../extras/glfw/lib/$(Configuration)/$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -217,7 +223,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>glfw.lib;OpenGL32.lib;glu32.lib;chai3d.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw.lib;OpenGL32.lib;glu32.lib;chai3d.lib;glew32.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(ProjectDir)\lib;../../lib/$(Configuration)/$(Platform);../../extras/glfw/lib/$(Configuration)/$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>

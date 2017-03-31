@@ -65,9 +65,6 @@ void SimpleGeometry::bindGeometry()
 // SimpleTexGeometry
 //////////////////////
 
-
-
-
 SimpleTexGeometry::SimpleTexGeometry(GLenum mode) :bufferSize(0), mode(mode)
 {
 	initializeVAO();
@@ -101,7 +98,7 @@ bool SimpleTexGeometry::initializeVAO(){
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[TEXCOORD]);
 	glVertexAttribPointer(
-		0,					//Attribute
+		1,					//Attribute
 		2,					//# of components
 		GL_FLOAT,			//Type
 		GL_FALSE,			//Normalized?

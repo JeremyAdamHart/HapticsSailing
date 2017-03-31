@@ -23,7 +23,7 @@ TrackballCamera::TrackballCamera() : dir(vec3(0, 0, -1)), right(vec3(1, 0, 0)), 
 pos(vec3(0, 0, 1.f)){}
 
 TrackballCamera::TrackballCamera(vec3 _dir, vec3 _pos, const mat4 &projection) :dir(_dir), pos(_pos), projection(projection){
-	right = normalize(cross(dir, vec3(0, 1, 0)));
+	right = normalize(cross(dir, vec3(0, -1, 0)));
 	up = normalize(cross(right, dir));
 }
 

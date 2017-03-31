@@ -52,6 +52,15 @@
     <ClCompile Include="WaveFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MeshInfoLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ElementGeometry.cpp">
+      <Filter>Source Files\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="TorranceSparrow.cpp">
+      <Filter>Source Files\Materials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glSupport.h">
@@ -89,6 +98,15 @@
     </ClInclude>
     <ClInclude Include="WaveFunction.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshInfoLoader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ElementGeometry.h">
+      <Filter>Source Files\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="TorranceSparrow.h">
+      <Filter>Source Files\Materials</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
