@@ -3,6 +3,9 @@
 
 using namespace glm;
 
+Drawable::Drawable(const glm::mat4 &model_matrix, Material *material, GLGeometryContainer *geometry) : model_matrix(model_matrix), material(material), geometry(geometry)
+{}
+
 void Drawable::loadUniforms(const mat4 &camera_matrix, const mat4 &projectionMatrix, 
 	const vec3 &viewPosition)
 {

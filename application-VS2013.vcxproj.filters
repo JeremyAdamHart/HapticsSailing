@@ -61,6 +61,12 @@
     <ClCompile Include="TorranceSparrow.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
+    <ClCompile Include="glmSupport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glSupport.h">
@@ -107,6 +113,12 @@
     </ClInclude>
     <ClInclude Include="TorranceSparrow.h">
       <Filter>Source Files\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="glmSupport.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

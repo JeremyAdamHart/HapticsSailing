@@ -11,7 +11,7 @@ class Drawable{
 public:
 	glm::mat4 model_matrix;
 
-	Drawable(const glm::mat4 &model_matrix=glm::mat4(), Material *material=nullptr, GLGeometryContainer *geometry=nullptr): model_matrix(model_matrix), material(material), geometry(geometry){}
+	Drawable(const glm::mat4 &model_matrix = glm::mat4(), Material *material = nullptr, GLGeometryContainer *geometry = nullptr);
 
 	Material *getMaterial(){ return material; }
 	void setMaterial(Material* newMaterial) { material = newMaterial; }

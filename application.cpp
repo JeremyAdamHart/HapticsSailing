@@ -19,6 +19,8 @@
 #include "MeshInfoLoader.h"
 #include "TorranceSparrow.h"
 #include "ElementGeometry.h"
+#include "glmSupport.h"
+#include "Physics.h"
 
 #include <random>
 //------------------------------------------------------------------------------
@@ -267,6 +269,26 @@ int main(int argc, char* argv[])
 	MeshInfoLoader cubeMesh;
 	cubeMesh.loadModel("models/cube.obj");
 
+	ElementGeometry cubeContainer(cubeMesh.vertices.data(), cubeMesh.normals.data(), 
+					cubeMesh.uvs.data(), cubeMesh.indices.data(), cubeMesh.vertices.size(), cubeMesh.indices.size(), GL_TRIANGLES);
+	TorranceSparrow cubeMat;
+	Drawable cube(translateMatrix(vec3(0, 10.f, 0)), &cubeMat, &cubeContainer);
+
+	float mass = 10.0;
+	mat3 I = mass/12.f*mat3(vec3(8.f, 0, 0),
+		vec3(0, 8.f, 0),
+		vec3(0, 0, 8.f));
+	RigidBody physicsCube(mass, I);
+	physicsCube.p = vec3(0, 10.f, 0);
+
+	vec3 cubePoints[] = { vec3(1, 1, 1),
+		vec3(1, 1, -1),
+		vec3(1, -1, 1),
+		vec3(1, -1, -1),
+		vec3(-1, 1, 1),
+		vec3(-1, 1, -1),
+		vec3(-1, -1, 1),
+		vec3(-1, -1, -1) };
 //	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	srand(time(0));
@@ -274,7 +296,7 @@ int main(int argc, char* argv[])
 	float posRange = 20.f;
 	float heightRange = 0.5f;
 	float wavelengthRange = 20.f;
-	float speedRange = 0.8f;
+	float speedRange = 0.3f;
 
 	vector<WaveFunction> waves;
 
@@ -288,14 +310,15 @@ int main(int argc, char* argv[])
 			rand01()*heightRange));
 	}
 
+
+
 	float timeElapsed = 0.f;
 
+	//Make water
 	SimpleGeometry waterGeometry(points.data(), points.size(), GL_PATCHES);
 	ToonWater waterMat(&waves, &timeElapsed);
 	SimpleMaterial mat;
-	Drawable water(mat4(), &waterMat, &waterGeometry);
-
-	water.model_matrix = mat4()*10.f;
+	Drawable water(scaleMatrix(20.f), &waterMat, &waterGeometry);
 	
 	checkGLErrors("Pre loop");
 
@@ -310,7 +333,26 @@ int main(int argc, char* argv[])
 	while (!glfwWindowShouldClose(window)){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		for (int i = 0; i < 8; i++){
+			vec4 p4 = cube.model_matrix*vec4(cubePoints[i], 1);
+			vec3 point = vec3(p4.x, p4.y, p4.z);
+			float height = 0.f;
+			for (int j = 0; j < waves.size(); j++){
+				height += waves[j].f(vec2(point.x, point.z), timeElapsed);
+			}
+
+			float k = 30;
+			float diff = height - point.y;
+			if (diff > 0)
+				physicsCube.addForce(vec3(0, k*diff, 0), point);
+
+		}
+
+		physicsCube.resolveForces(1.f / 60.f);
+		cube.model_matrix = physicsCube.matrix();
+
 		ris.draw(cam, &water);
+		ris.draw(cam, &cube);
 
 		timeElapsed += 1.f / 60.f;
 

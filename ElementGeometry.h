@@ -29,11 +29,11 @@ public:
 					size_t _bufferSize, size_t _elementNum, GLenum usage=GL_STATIC_DRAW);
 
 	virtual void bindGeometry();
-	virtual int startIndex() { return 0; }
-	virtual int numElements() { return bufferSize; }
-	virtual GLenum getMode() { return mode; }
+	virtual int startIndex();
+	virtual int numElements();
+	virtual GLenum getMode();
 
-	virtual bool usingDrawElements() { return false; }
+	virtual bool usingDrawElements();
 };
 
 /*

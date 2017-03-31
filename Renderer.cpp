@@ -75,6 +75,8 @@ void Renderer::draw(const Camera &cam, Drawable *object)
 
 	checkGLErrors("loadUniforms");
 
+	int number = geometry->numElements();
+
 	if (geometry->usingDrawElements())
 		glDrawElements(geometry->getMode(), geometry->numElements(), GL_UNSIGNED_INT, 
 		(void*)(geometry->startIndex()*sizeof(unsigned int)));

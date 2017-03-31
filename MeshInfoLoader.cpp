@@ -7,7 +7,7 @@
 #include "MeshInfoLoader.h"
 #include <windows.h>
 #include <fstream>
-#include "soil/SOIL.h"
+//#include "soil/SOIL.h"
 
 #pragma warning(disable:4996)
 
@@ -216,8 +216,10 @@ bool MeshInfoLoader::loadModel(char *filename)
 	//void sharedIndices(vector<unsigned int> &_faces, vector<unsigned int> &_nFaces, vector<vec3> &_normals,
 	//					vector<vec3> &vertices, vector<vec3> &normals, vector<unsigned int> &faces)
 
-	if (noUVs)
+	if (noUVs){
 		sharedIndices(_faces, _nfaces, _normals, vertices, normals, indices);
+		uvs.resize(vertices.size(), vec2(0, 0));
+	}
 	else
 		sharedIndices(_faces, _nfaces, _uvfaces, _normals, _uvs, vertices, normals, uvs, indices);
 
@@ -270,7 +272,7 @@ float MeshInfoLoader::getBoundingRadius()
 
 	return boundingRadius;
 }
-
+/*
 unsigned int LoadTexture(const char * filename) {
 	unsigned int textureID = SOIL_load_OGL_texture
 		(
@@ -281,4 +283,4 @@ unsigned int LoadTexture(const char * filename) {
 		);
 	
 	return textureID;
-}
+}*/

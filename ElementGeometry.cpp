@@ -52,17 +52,6 @@ bool ElementGeometry::initializeVAO() {
 		(void*)0			//Offset
 	);
 
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[TEXCOORD]);
-	glVertexAttribPointer(
-		2,					//Attribute
-		2,					//# of components
-		GL_FLOAT,			//Type
-		GL_FALSE,			//Normalized?
-		sizeof(vec2),		//Stride
-		(void*)0			//Offset
-	);
-
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[NORMAL]);
 	glVertexAttribPointer(
@@ -74,6 +63,17 @@ bool ElementGeometry::initializeVAO() {
 		(void*)0			//Offset
 	);
 
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[TEXCOORD]);
+	glVertexAttribPointer(
+		2,					//Attribute
+		2,					//# of components
+		GL_FLOAT,			//Type
+		GL_FALSE,			//Normalized?
+		sizeof(vec2),		//Stride
+		(void*)0			//Offset
+		);
+
 	glBindVertexArray(0);
 
 	return !checkGLErrors("initVao");
@@ -84,4 +84,11 @@ bool ElementGeometry::initializeVAO() {
 void ElementGeometry::bindGeometry()
 {
 	glBindVertexArray(vao);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[ELEMENTS]);
 }
+
+int ElementGeometry::startIndex() { return 0; }
+int ElementGeometry::numElements() { return elementNum; }
+GLenum ElementGeometry::getMode() { return mode; }
+
+bool ElementGeometry::usingDrawElements() { return true; }
