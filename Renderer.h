@@ -7,10 +7,27 @@
 #include "Scene.h"
 #include "Camera.h"
 
-class Framebuffer{
+struct Framebuffer{
 	GLuint id;
+	GLuint depthID;
+	GLuint texID;
+
+	bool depthAttachment = false;
+	bool colorAttachment = false;
+
 	int width, height;
+
+
+	Framebuffer();
+
+	void useFramebuffer();
+	void deleteFramebuffer();
+
+	void setTexture(GLuint texture);
+	void setDepthbuffer(GLuint renderbuffer);
 };
+
+Framebuffer createFramebuffer(unsigned int width, unsigned int height, GLuint texture);
 
 class Renderer{
 	GLFWwindow* window;

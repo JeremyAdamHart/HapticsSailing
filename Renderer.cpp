@@ -6,8 +6,54 @@
 
 using namespace std;
 
+Framebuffer::Framebuffer() :id(0), width(0), height(0), texID(0) {}
+
+void Framebuffer::useFramebuffer() {
+	glBindFramebuffer(GL_FRAMEBUFFER, id);
+}
+
+void Framebuffer::deleteFramebuffer() {
+	if(colorAttachment)
+		glDeleteTextures(1, &texID);
+	if (depthAttachment)
+		glDeleteRenderbuffers(1, &depthID);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDeleteFramebuffers(1, &id);
+	width = height = 0;
+}
+
+void Framebuffer::setTexture(GLuint texture) {
+	glBindFramebuffer(GL_FRAMEBUFFER, id);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	texID = texture;
+	colorAttachment = false;
+}
+
+void Framebuffer::setDepthbuffer(GLuint renderbuffer) {
+	glBindFramebuffer(GL_FRAMEBUFFER, id);
+
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer);
+
+}
+
 Renderer::Renderer():window(NULL){
 	
+}
+
+Framebuffer createFramebuffer(unsigned int width, unsigned int height, GLuint texture)
+{
+	Framebuffer fb;
+	glGenFramebuffers(1, &fb.id);
+	glBindFramebuffer(GL_FRAMEBUFFER, fb.id);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+	//Depth buffer
+	
+
 }
 
 GLFWwindow* Renderer::createWindow(int width, int height){
