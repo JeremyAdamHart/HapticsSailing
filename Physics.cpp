@@ -11,19 +11,15 @@ RigidBody::RigidBody(float mass, mat3 inertialTensor) :force(0.f), torque(0.f), 
 
 void RigidBody::addForce(vec3 f, vec3 loc){
 	vec3 r = loc - p;
-	force += dot(f, r)*r / dot(r, r);
+	force += f;	// dot(f, r)*r / dot(r, r);
 	torque += cross(r, f);
 }
 
 void RigidBody::resolveForces(float dt){
 
-	printf("Force(%f, %f, %f)\n", force.x, force.y, force.z);
-
 	//Linear integration
 	v += force/mass*dt;
 	p += v*dt;
-
-//	printf("V(%f, %f, %f)\n", v.x, v.y, v.z);
 
 	//Rotational integration
 	mat3 IinvWorld = mat3_cast(q)*Iinv*transpose(mat3_cast(q));
