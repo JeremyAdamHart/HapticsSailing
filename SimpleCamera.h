@@ -15,7 +15,7 @@ public:
 
 	SimpleCamera();
 
-	SimpleCamera(glm::vec3 _dir, glm::vec3 _pos, glm::vec3 _up, glm::mat4 &projection = glm::mat4());
+	SimpleCamera(glm::vec3 _dir, glm::vec3 _up, glm::vec3 _pos, const glm::mat4 &projection = glm::mat4());
 
 	glm::mat4 getCameraMatrix() const;
 	glm::mat4 getProjectionMatrix() const;

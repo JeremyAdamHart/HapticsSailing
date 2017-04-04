@@ -29,6 +29,7 @@
     <ClCompile Include="MeshInfoLoader.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SimpleCamera.cpp" />
     <ClCompile Include="SimpleMaterial.cpp" />
     <ClCompile Include="TorranceSparrow.cpp" />
     <ClCompile Include="TrackballCamera.cpp" />
@@ -44,6 +45,7 @@
     <ClInclude Include="GLGeometry.h" />
     <ClInclude Include="glSupport.h" />
     <ClInclude Include="glmSupport.h" />
+    <ClInclude Include="SimpleCamera.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MeshInfoLoader.h" />
     <ClInclude Include="Physics.h" />
