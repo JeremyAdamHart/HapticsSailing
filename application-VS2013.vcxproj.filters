@@ -67,8 +67,11 @@
     <ClCompile Include="Physics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SimpleCamera.cpp">
+    <ClCompile Include="TrackerCamera.cpp">
       <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="PosTexture.cpp">
+      <Filter>Source Files\Materials</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -123,8 +126,11 @@
     <ClInclude Include="Physics.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="SimpleCamera.h">
+    <ClInclude Include="TrackerCamera.h">
       <Filter>Source Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="PosTexture.h">
+      <Filter>Source Files\Materials</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

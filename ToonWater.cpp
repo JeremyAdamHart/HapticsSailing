@@ -39,34 +39,6 @@ void ToonWater::initializeShader()
 GLint ToonWater::getProgram() { return program; }
 void ToonWater::deleteProgram() { glDeleteProgram(program); }
 
-
-/*
-	Following function found from 
-	https://gist.github.com/dgiagio/b0187dac64b60e6ff626
-	created by Diego Giagio
-*/
-
-std::string str(const char *fmt, ...) {
-	va_list args;
-	va_start(args, fmt);
-	char buf[32];
-	size_t n = std::vsnprintf(buf, sizeof(buf), fmt, args);
-	va_end(args);
-
-	// Static buffer large enough?
-	if (n < sizeof(buf)) {
-		return{ buf, n };
-	}
-
-	// Static buffer too small
-	std::string s(n + 1, 0);
-	va_start(args, fmt);
-	std::vsnprintf(const_cast<char*>(s.data()), s.size(), fmt, args);
-	va_end(args);
-
-	return s;
-}
-
 void ToonWater::loadUniforms() 
 {
 	glUseProgram(program);

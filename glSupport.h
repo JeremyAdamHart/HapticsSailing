@@ -6,6 +6,8 @@
 
 using namespace std;
 
+std::string str(const char *fmt, ...);
+
 string fileToString(const string &filename);
 
 GLuint createShader(const string &source, GLenum shaderType);

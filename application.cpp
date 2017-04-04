@@ -14,6 +14,7 @@
 #include "ToonWater.h"
 #include "Renderer.h"
 #include "TrackballCamera.h"
+#include "TrackerCamera.h"
 #include "SimpleGeometry.h"
 #include "SimpleMaterial.h"
 #include "MeshInfoLoader.h"
@@ -239,11 +240,6 @@ int main(int argc, char* argv[])
 	activeCamera = &cam;
 
 	vector<vec3> points;
-/*	points.push_back(vec3(-1, 1, 0));
-	points.push_back(vec3(1, 1, 0));
-	points.push_back(vec3(-1, -1, 0));
-	points.push_back(vec3(1, -1, 0));*/
-
 	points.push_back(vec3(-1, 0, 1));
 	points.push_back(vec3(1, 0, 1));
 	points.push_back(vec3(-1, 0, -1));
@@ -280,6 +276,7 @@ int main(int argc, char* argv[])
 	RigidBody physicsCube(mass, I);
 	physicsCube.p = vec3(0, 5.f, 0);
 	physicsCube.omega = vec3(1, 1, 0);
+	physicsCube.v = vec3(2, 0, 0);
 
 
 	vec3 cubePoints[] = { 
@@ -313,8 +310,6 @@ int main(int argc, char* argv[])
 			rand01()*heightRange));
 	}
 
-
-
 	float timeElapsed = 0.f;
 
 	//Make water
@@ -322,6 +317,10 @@ int main(int argc, char* argv[])
 	ToonWater waterMat(&waves, &timeElapsed);
 	SimpleMaterial mat;
 	Drawable water(scaleMatrix(20.f), &waterMat, &waterGeometry);
+
+	//RENDER WATER SURFACE
+	Framebuffer fb = createPositionFramebuffer(100, 100);
+	TrackerCamera shipTrackingCam;
 	
 	checkGLErrors("Pre loop");
 
@@ -348,7 +347,6 @@ int main(int argc, char* argv[])
 
 			float k = 1000;
 			float diff = std::min(height - point.y, 2.f);
-			printf("Diff = %f\n", diff);
 			if (diff > 0)
 				physicsCube.addForce(vec3(0, k*diff, 0), point);
 		}
@@ -359,8 +357,13 @@ int main(int argc, char* argv[])
 		physicsCube.resolveForces(1.f / 60.f);
 		cube.model_matrix = physicsCube.matrix();
 
-		ris.draw(cam, &water);
-		ris.draw(cam, &cube);
+		shipTrackingCam.trackGeometryXZ(cubePoints, 8, cube.model_matrix);
+
+//		ris.draw(cam, &water);
+//		ris.draw(cam, &cube);
+
+		ris.draw(shipTrackingCam, &water);
+		ris.draw(shipTrackingCam, &cube);
 
 		timeElapsed += 1.f / 60.f;
 

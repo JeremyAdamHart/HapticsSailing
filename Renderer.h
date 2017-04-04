@@ -6,6 +6,9 @@
 
 #include "Scene.h"
 #include "Camera.h"
+#include <limits>
+
+const unsigned int NO_VALUE = std::numeric_limits<unsigned int>::max();
 
 struct Framebuffer{
 	GLuint id;
@@ -27,7 +30,16 @@ struct Framebuffer{
 	void setDepthbuffer(GLuint renderbuffer);
 };
 
-Framebuffer createFramebuffer(unsigned int width, unsigned int height, GLuint texture);
+GLuint createEmptyTexture(unsigned int width, unsigned int height, GLint internalFormat, GLenum format, GLenum type);
+
+GLuint createDepthbuffer(unsigned int width, unsigned int height);
+
+Framebuffer createFramebuffer(unsigned int width, unsigned int height, GLuint texture, GLuint depthbuffer);
+
+Framebuffer createDepthFramebuffer(unsigned int width, unsigned int height,
+	GLuint depthbuffer=NO_VALUE);
+
+Framebuffer createPositionFramebuffer(unsigned int width, unsigned int height);
 
 class Renderer{
 	GLFWwindow* window;
@@ -35,6 +47,8 @@ public:
 	Renderer();
 
 	GLFWwindow* createWindow(int width = 800, int height = 800);
+
+	void useDefaultFramebuffer();
 
 	void draw(const Camera &cam, Scene *scene);
 
