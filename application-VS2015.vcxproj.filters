@@ -8,18 +8,18 @@
     <Filter Include="Source Files\Camera">
       <UniqueIdentifier>{7e0946b6-e71f-4daa-9f64-4a7a4cfaa4bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Materials">
+      <UniqueIdentifier>{e14d0f26-0dba-491f-b2f9-1fd1e0190439}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Geometry">
+      <UniqueIdentifier>{f5dcc498-bbb6-4a21-82df-93bfee209a99}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Drawable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ElementGeometry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="glmSupport.cpp">
@@ -28,16 +28,10 @@
     <ClCompile Include="glSupport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MeshInfoLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Physics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PosTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
@@ -46,42 +40,45 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SimpleGeometry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimpleMaterial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ToonWater.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TorranceSparrow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TrackballCamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TrackerCamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="WaterPhysics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WaveFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="TrackballCamera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="TrackerCamera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="PosTexture.cpp">
+      <Filter>Source Files\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleMaterial.cpp">
+      <Filter>Source Files\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="ToonWater.cpp">
+      <Filter>Source Files\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="TorranceSparrow.cpp">
+      <Filter>Source Files\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="ElementGeometry.cpp">
+      <Filter>Source Files\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleGeometry.cpp">
+      <Filter>Source Files\Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Drawable.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ElementGeometry.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GLGeometry.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="glmSupport.h">
@@ -90,16 +87,10 @@
     <ClInclude Include="glSupport.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="MeshInfoLoader.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Physics.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PosTexture.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
@@ -108,29 +99,44 @@
     <ClInclude Include="Scene.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="SimpleGeometry.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SimpleMaterial.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ToonWater.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TorranceSparrow.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TrackballCamera.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TrackerCamera.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="WaterPhysics.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="WaveFunction.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Source Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="TrackballCamera.h">
+      <Filter>Source Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="TrackerCamera.h">
+      <Filter>Source Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Source Files\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="PosTexture.h">
+      <Filter>Source Files\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleMaterial.h">
+      <Filter>Source Files\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="ToonWater.h">
+      <Filter>Source Files\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="TorranceSparrow.h">
+      <Filter>Source Files\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="ElementGeometry.h">
+      <Filter>Source Files\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="GLGeometry.h">
+      <Filter>Source Files\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleGeometry.h">
+      <Filter>Source Files\Geometry</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
