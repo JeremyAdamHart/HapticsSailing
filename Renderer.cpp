@@ -73,6 +73,8 @@ GLuint createEmptyTexture(unsigned int width, unsigned int height, GLint interna
 Framebuffer createPositionFramebuffer(unsigned int width, unsigned int height)
 {
 	Framebuffer fb;
+	fb.width = width;
+	fb.height = height;
 	glGenFramebuffers(1, &fb.id);
 
 	fb.setTexture(createEmptyTexture(width, height, GL_RGB32F, GL_RGB, GL_FLOAT));
@@ -95,6 +97,8 @@ Framebuffer createPositionFramebuffer(unsigned int width, unsigned int height)
 Framebuffer createFramebuffer(unsigned int width, unsigned int height, GLuint texture, GLuint depthbuffer)
 {
 	Framebuffer fb;
+	fb.width = width;
+	fb.height = height;
 	glGenFramebuffers(1, &fb.id);
 	
 	fb.setTexture(texture);
@@ -119,6 +123,8 @@ GLuint createDepthbuffer(unsigned int width, unsigned int height)
 Framebuffer createDepthFramebuffer(unsigned int width, unsigned int height, GLuint depthbuffer)
 {
 	Framebuffer fb;
+	fb.width = width;
+	fb.height = height;
 
 	glGenFramebuffers(1, &fb.id);
 

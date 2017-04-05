@@ -17,8 +17,10 @@ PosObject::PosObject()
 
 void PosObject::initializeShader()
 {
-	GLuint vertexShader = createShader(fileToString("shaders/PosObject.vert"), GL_VERTEX_SHADER);
-	GLuint fragmentShader = createShader(fileToString("shaders/PosObject.frag"), GL_FRAGMENT_SHADER);
+	cout << "Compiling posObject.vert" << endl;
+	GLuint vertexShader = createShader(fileToString("shaders/posObject.vert"), GL_VERTEX_SHADER);
+	cout << "Compiling posObject.frag" << endl;
+	GLuint fragmentShader = createShader(fileToString("shaders/posObject.frag"), GL_FRAGMENT_SHADER);
 	program = createProgram(vertexShader, fragmentShader, 0, 0);
 }
 

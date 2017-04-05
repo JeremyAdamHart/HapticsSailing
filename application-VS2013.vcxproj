@@ -37,6 +37,7 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="SimpleGeometry.cpp" />
     <ClCompile Include="ToonWater.cpp" />
+    <ClCompile Include="WaterPhysics.cpp" />
     <ClCompile Include="WaveFunction.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +59,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="SimpleGeometry.h" />
     <ClInclude Include="ToonWater.h" />
+    <ClInclude Include="WaterPhysics.h" />
     <ClInclude Include="WaveFunction.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
