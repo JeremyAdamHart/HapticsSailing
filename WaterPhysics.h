@@ -13,7 +13,6 @@
 
 class WaterPhysics{
 	TrackerCamera cam;
-	std::vector<WaveFunction> waves;
 	std::vector<glm::vec3> topObject;
 	std::vector<glm::vec3> bottomObject;
 	std::vector<glm::vec3> waterSurface;
@@ -30,6 +29,7 @@ class WaterPhysics{
 	unsigned int width, height;
 
 public:
+	std::vector<WaveFunction> waves;
 	
 	Drawable renderable;
 

@@ -20,6 +20,8 @@ WaterPhysics::WaterPhysics(Renderer *r, unsigned int width, unsigned int height,
 	waterPoints.push_back(scale*vec3(-1, 0, -1));
 	waterPoints.push_back(scale*vec3(1, 0, -1));
 
+	waterGeom = SimpleGeometry(waterPoints.data(), waterPoints.size(), GL_PATCHES);
+
 	fb = createPositionFramebuffer(width, height);
 
 	//Texture copy buffers
@@ -72,6 +74,7 @@ void WaterPhysics::addForces(glm::vec3 *vertices, size_t numVertices, Drawable *
 	glBindTexture(GL_TEXTURE_2D, fb.texID);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, waterSurface.data());
 
+	glClearDepth(0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Draw object bottom
@@ -81,6 +84,7 @@ void WaterPhysics::addForces(glm::vec3 *vertices, size_t numVertices, Drawable *
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, bottomObject.data());
 
 	//Return state
+	glClearDepth(1.f);
 	glDepthFunc(GL_LEQUAL);
 	r->useDefaultFramebuffer();
 
@@ -93,11 +97,12 @@ void WaterPhysics::addForces(glm::vec3 *vertices, size_t numVertices, Drawable *
 	for (int i = 0; i < fb.width*fb.height; i++)
 	{
 		if (topObject[i] != clearColor) {
-			float depth = clamp(bottomObject[i].y - waterSurface[i].y, 
+			float depth = clamp(waterSurface[i].y - bottomObject[i].y,
 				0.f, topObject[i].y - bottomObject[i].y);
 
 			//Addforces
-			pObject->addForce(-GRAVITY*xWidth*zWidth*WATER_DENSITY, bottomObject[i]);	
+			if(depth >= 0.00001f)
+				pObject->addForce(-GRAVITY*depth*xWidth*zWidth*WATER_DENSITY, bottomObject[i]);	
 		}
 	}
 

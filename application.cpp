@@ -271,7 +271,7 @@ int main(int argc, char* argv[])
 	TorranceSparrow cubeMat;
 	Drawable cube(translateMatrix(vec3(0, 5.f, 0)), &cubeMat, &cubeContainer);
 
-	float mass = 10.f;
+	float mass = 2000.f;
 	mat3 I = mass/12.f*mat3(vec3(cHeight*cHeight + cDepth*cDepth, 0, 0),
 		vec3(0, cWidth*cWidth + cDepth*cDepth, 0),
 		vec3(0, 0, cWidth*cWidth + cHeight*cHeight));
@@ -313,10 +313,15 @@ int main(int argc, char* argv[])
 	}
 
 	float timeElapsed = 0.f;
+	//Cube geometry for bouyancy
+	PosObject bouyCubeMat;
+	Drawable bouyCube(cube.model_matrix, &bouyCubeMat, &cubeContainer);
+
+	WaterPhysics waterBouyancy(&ris, 80, 80, &timeElapsed);
 
 	//Make water
 	SimpleGeometry waterGeometry(points.data(), points.size(), GL_PATCHES);
-	ToonWater waterMat(&waves, &timeElapsed);
+	ToonWater waterMat(&waterBouyancy.waves, &timeElapsed);
 	Drawable water(scaleMatrix(20.f), &waterMat, &waterGeometry);
 	//SimpleMaterial mat;
 
@@ -330,11 +335,6 @@ int main(int argc, char* argv[])
 	PosWater bouyWaterMat(&waves, &timeElapsed);
 	Drawable bouyWater (scaleMatrix(5.f), &bouyWaterMat, &waterGeometry);
 
-	//Cube geometry for bouyancy
-	PosObject bouyCubeMat;
-	Drawable bouyCube(cube.model_matrix, &bouyCubeMat, &cubeContainer);
-
-	WaterPhysics waterBouyancy(&ris, 20, 20, &timeElapsed);
 
 	//Array for postions
 	vec3 renderPos[buffWidth*buffHeight];
@@ -370,8 +370,8 @@ int main(int argc, char* argv[])
 
 		waterBouyancy.addForces(cubePoints, 8, &bouyCube, &physicsCube);
 
-		physicsCube.force += -physicsCube.v*DAMPING_LINEAR + physicsCube.mass*GRAVITY;
-		physicsCube.torque -= physicsCube.omega*DAMPING_ANGULAR;
+		physicsCube.force += -physicsCube.v*DAMPING_LINEAR*mass*0.05f + physicsCube.mass*GRAVITY;
+		physicsCube.torque -= physicsCube.omega*DAMPING_ANGULAR*mass*0.1f;
 
 		physicsCube.resolveForces(1.f / 60.f);
 		bouyCube.model_matrix = cube.model_matrix = physicsCube.matrix();
@@ -384,7 +384,7 @@ int main(int argc, char* argv[])
 	//	ris.draw(shipTrackingCam, &bouyWater);
 	//	ris.draw(shipTrackingCam, &bouyCube);
 
-		fb.useFramebuffer();
+/*		fb.useFramebuffer();
 		glClearColor(0.0, 0.0, 0.0, 0.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -393,7 +393,7 @@ int main(int argc, char* argv[])
 
 		//Get values from framebuffer
 		glBindTexture(GL_TEXTURE_2D, fb.texID);
-		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, renderPos);
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, renderPos);*/
 
 		ris.useDefaultFramebuffer();
 
