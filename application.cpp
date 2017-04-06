@@ -373,11 +373,11 @@ int main(int argc, char* argv[])
 
 		shipTrackingCam.trackGeometryXZ(cubePoints, 8, cube.model_matrix);
 
-	//	ris.draw(cam, &water);
-	//	ris.draw(cam, &cube);
+		ris.draw(cam, &water);
+		ris.draw(cam, &cube);
 
-		ris.draw(shipTrackingCam, &bouyWater);
-		ris.draw(shipTrackingCam, &bouyCube);
+	//	ris.draw(shipTrackingCam, &bouyWater);
+	//	ris.draw(shipTrackingCam, &bouyCube);
 
 		fb.useFramebuffer();
 		glClearColor(0.0, 0.0, 0.0, 0.0);
