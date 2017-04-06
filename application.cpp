@@ -23,6 +23,7 @@
 #include "glmSupport.h"
 #include "Physics.h"
 #include "PosTexture.h"
+#include "WaterPhysics.h"
 
 #include <random>
 //------------------------------------------------------------------------------
@@ -124,7 +125,7 @@ TrackballCamera* activeCamera = NULL;
 bool leftMouseDown = false;
 bool rightMouseDown = false;
 
-float rand01() { return float(rand()) / float(RAND_MAX); }
+static float rand01() { return float(rand()) / float(RAND_MAX); }
 
 //==============================================================================
 /*
@@ -333,6 +334,8 @@ int main(int argc, char* argv[])
 	PosObject bouyCubeMat;
 	Drawable bouyCube(cube.model_matrix, &bouyCubeMat, &cubeContainer);
 
+	WaterPhysics waterBouyancy(&ris, 20, 20, &timeElapsed);
+
 	//Array for postions
 	vec3 renderPos[buffWidth*buffHeight];
 
@@ -351,7 +354,7 @@ int main(int argc, char* argv[])
 		glClearColor(0.6f, 0.8f, 1.0f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		for (int i = 0; i < 8; i++){
+		/*for (int i = 0; i < 8; i++){
 			vec4 p4 = cube.model_matrix*vec4(cubePoints[i], 1);
 			vec3 point = vec3(p4.x, p4.y, p4.z);
 			float height = 0.f;
@@ -363,7 +366,9 @@ int main(int argc, char* argv[])
 			float diff = std::min(height - point.y, 2.f); 
 			if (diff > 0)
 				physicsCube.addForce(vec3(0, k*diff, 0), point);
-		}
+		}*/
+
+		waterBouyancy.addForces(cubePoints, 8, &bouyCube, &physicsCube);
 
 		physicsCube.force += -physicsCube.v*DAMPING_LINEAR + physicsCube.mass*GRAVITY;
 		physicsCube.torque -= physicsCube.omega*DAMPING_ANGULAR;
