@@ -1,6 +1,9 @@
 #include "Physics.h"
 #include <stdio.h>
 #include <Eigen/Core>
+#include <random>
+#include <ctime>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace glm;
 
@@ -45,18 +48,106 @@ void RigidBody::resolveForces(float dt){
 
 mat4 RigidBody::matrix(){ return translateMatrix(p)*mat4_cast(q); }
 
-void calculateMeshMassPoints(MeshInfoLoader *geometry, vector<float> *masses, vector<vec3> *positions, int numPoints){
+static float rand01() { return float(rand()) / float(RAND_MAX); }
+
+void calculateMeshMassPoints(MeshInfoLoader *geometry, vector<float> *masses, vector<vec3> *points, int numPoints){
 	//Generate random points along mesh
+	//Calculate total area
+	float totalArea = 0.f;
+	vector<float> areas;
+
+	for (int i = 0; i < geometry->indices.size() + 2; i+=3){
+		vec3 p1 = geometry->vertices[geometry->indices[i]];
+		vec3 p2 = geometry->vertices[geometry->indices[i+1]];
+		vec3 p3 = geometry->vertices[geometry->indices[i+2]];
+		
+		float area = 0.5f*length(cross(p2 - p1, p3 - p1));
+
+		totalArea += area;
+		areas.push_back(totalArea);
+	}
+
+	float stepSize = totalArea / float(numPoints - 1);
+	float a = 0.f;
+
+	srand(time(0));
+
+	int j = 0;
+	for (int i = 0; i < numPoints; i++){
+
+		while (a > areas[j]){
+			j++;
+		}
+
+		if (3 * j + 2 >= geometry->indices.size())
+			break;
+
+		vec3 p1 = geometry->vertices[geometry->indices[3*j]];
+		vec3 p2 = geometry->vertices[geometry->indices[3*j + 1]];
+		vec3 p3 = geometry->vertices[geometry->indices[3*j + 2]];
+
+		float s = rand01();
+		float t = rand01();
+
+		if (s + t > 1.f){
+			s = 1.f - s;
+			t = 1.f - t;
+		}
+
+		points->push_back(p1 + (p2 - p1)*s + (p2 - p1)*t);
+
+		a += stepSize;
+	}
 
 	//Solve for mass values that produce origin as center of mass
+	//Calculate uniform center of mass
+	vec3 original_com = vec3(0.f);
+	for (int i = 0; i < points->size(); i++){
+		original_com += points->at(i) / float(points->size());
+	}
+
+	//Create points matrix
+	Eigen::Matrix<float, 4, Eigen::Dynamic> P(4, numPoints);
+
+	for (int i = 0; i < points->size(); i++){
+		P(0, i) = points->at(i).x;
+		P(1, i) = points->at(i).y;
+		P(2, i) = points->at(i).z;
+		P(3, i) = 1.f;
+	}
+
+	Eigen::Matrix<float, 4, 1> c;
+	c << -original_com.x, -original_com.y, -original_com.z, 0.f;
+
+	Eigen::Matrix<float, Eigen::Dynamic, 1> m = P*(P*P.transpose()).inverse()*c;
+
+	for (int i = 0; i < numPoints; i++){
+		masses->push_back(1.f / float(numPoints) + m(i, 1));
+	}
 
 }
 
 mat3 calculateInertialTensor(MeshInfoLoader *geometry, float mass){
-	Eigen::Matrix<float, 20, 1> vec;
-	Eigen::Matrix<float, 20, 20> mat;
+	vector<vec3> points;
+	vector<float> masses;
 
-	Eigen::Matrix<float, 20, 1> v2 = mat*vec;
+	const int NUM_POINTS = 1000;
+	calculateMeshMassPoints(geometry, &masses, &points, NUM_POINTS);
 
-	return mat3();
+	if (masses.size() != points.size())
+		cout << "Error" << endl;
+
+	mat3 inertialTensor(0.f);
+	for (int i = 0; i < points.size(); i++){
+		vec3 p = points[i];
+		float m = masses[i];
+//		mat3 massTensor;
+		float tensor[9] = {
+			m*(p.y*p.y + p.z*p.z), -m*p.y*p.x, -m*p.z*p.x,
+			-m*p.x*p.y, m*(p.x*p.x + p.z*p.z), -m*p.z*p.y,
+			-m*p.x*p.z, -m*p.y*p.z, m*(p.x*p.x + p.y*p.y) };
+		inertialTensor += make_mat3(tensor);
+	}
+
+	return inertialTensor;
 }

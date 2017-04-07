@@ -255,6 +255,8 @@ int main(int argc, char* argv[])
 	//Import cube
 	MeshInfoLoader cubeMesh;
 	cubeMesh.loadModel("models/cube.obj");
+	MeshInfoLoader shipCollisionMesh;
+	shipCollisionMesh.loadModel("models/shipCollision.obj");
 
 	float cWidth = 3.f;
 	float cHeight = 1.f;
