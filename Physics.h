@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include "glmSupport.h"
+#include "MeshInfoLoader.h"
 
 const float DAMPING_LINEAR = 10.f;
 const float DAMPING_ANGULAR = 10.f;
@@ -23,9 +24,14 @@ public:
 	glm::mat3 I;
 	glm::mat3 Iinv;
 
+	RigidBody(float mass, MeshInfoLoader *geometry);
+
 	RigidBody(float mass, glm::mat3 inertialTensor);
 
 	void addForce(glm::vec3 f, glm::vec3 loc);
 	void resolveForces(float dt);
 	glm::mat4 matrix();
 };
+
+void calculateMeshMassPoints(MeshInfoLoader *geometry, vector<float> *masses, vector<glm::vec3> *positions, int numPoints);
+glm::mat3 calculateInertialTensor(MeshInfoLoader *geometry, float mass);

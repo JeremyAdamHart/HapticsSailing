@@ -1,5 +1,6 @@
 #include "Physics.h"
 #include <stdio.h>
+#include <Eigen/Core>
 
 using namespace glm;
 
@@ -7,6 +8,14 @@ RigidBody::RigidBody(float mass, mat3 inertialTensor) :force(0.f), torque(0.f), 
 	mass(mass), q(quat()), omega(0.f), I(inertialTensor), Iinv(inverse(inertialTensor))
 {
 
+}
+
+RigidBody::RigidBody(float mass, MeshInfoLoader *geometry) :force(0.f), torque(0.f), p(0.f), v(0.f),
+mass(mass), q(quat()), omega(0.f)
+{
+
+//	I = calculateInertialTensor(geometry);		//Assumes center of mass is at origin
+	Iinv = inverse(I);
 }
 
 void RigidBody::addForce(vec3 f, vec3 loc){
@@ -35,3 +44,19 @@ void RigidBody::resolveForces(float dt){
 }
 
 mat4 RigidBody::matrix(){ return translateMatrix(p)*mat4_cast(q); }
+
+void calculateMeshMassPoints(MeshInfoLoader *geometry, vector<float> *masses, vector<vec3> *positions, int numPoints){
+	//Generate random points along mesh
+
+	//Solve for mass values that produce origin as center of mass
+
+}
+
+mat3 calculateInertialTensor(MeshInfoLoader *geometry, float mass){
+	Eigen::Matrix<float, 20, 1> vec;
+	Eigen::Matrix<float, 20, 20> mat;
+
+	Eigen::Matrix<float, 20, 1> v2 = mat*vec;
+
+	return mat3();
+}

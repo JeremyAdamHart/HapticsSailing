@@ -290,54 +290,19 @@ int main(int argc, char* argv[])
 		cScale3*vec3(-1, 1, -1),
 		cScale3*vec3(-1, -1, 1),
 		cScale3*vec3(-1, -1, -1) };
-//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	srand(time(0));
-
-	float posRange = 20.f;
-	float heightRange = 0.5f;
-	float wavelengthRange = 20.f;
-	float speedRange = 0.3f;
-
-	vector<WaveFunction> waves;
-
-	//Generate wind directions
-	for (int i = 0; i < MAX_WAVE_NUMBER; i++){
-		waves.push_back(WaveFunction(
-			vec2(2.f*rand01() - 1.f, 2.f*rand01() - 1.f),
-			vec2(rand01()*2.f - 1.f, rand01()*2.f - 1.f)*posRange,
-			rand01()*wavelengthRange + 3.0f,
-			rand01()*speedRange + 0.2f,
-		//	0.f));	
-			rand01()*heightRange));
-	}
 
 	float timeElapsed = 0.f;
 	//Cube geometry for bouyancy
 	PosObject bouyCubeMat;
 	Drawable bouyCube(cube.model_matrix, &bouyCubeMat, &cubeContainer);
 
-	WaterPhysics waterBouyancy(&ris, 80, 80, &timeElapsed);
+	WaterPhysics waterBouyancy(&ris, 20, 20, &timeElapsed);
 
 	//Make water
 	SimpleGeometry waterGeometry(points.data(), points.size(), GL_PATCHES);
 	ToonWater waterMat(&waterBouyancy.waves, &timeElapsed);
 	Drawable water(scaleMatrix(20.f), &waterMat, &waterGeometry);
-	//SimpleMaterial mat;
-
-
-	//RENDER WATER SURFACE
-	const unsigned int buffWidth = 20;
-	const unsigned int buffHeight = 20;
-	Framebuffer fb = createPositionFramebuffer(buffWidth, buffHeight);
-	TrackerCamera shipTrackingCam;
-	
-	PosWater bouyWaterMat(&waves, &timeElapsed);
-	Drawable bouyWater (scaleMatrix(5.f), &bouyWaterMat, &waterGeometry);
-
-
-	//Array for postions
-	vec3 renderPos[buffWidth*buffHeight];
 
 	checkGLErrors("Pre loop");
 
@@ -354,20 +319,6 @@ int main(int argc, char* argv[])
 		glClearColor(0.6f, 0.8f, 1.0f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		/*for (int i = 0; i < 8; i++){
-			vec4 p4 = cube.model_matrix*vec4(cubePoints[i], 1);
-			vec3 point = vec3(p4.x, p4.y, p4.z);
-			float height = 0.f;
-			for (int j = 0; j < waves.size(); j++){
-				height += waves[j].f(vec2(point.x, point.z), timeElapsed);
-			}
-
-			float k = 1000;
-			float diff = std::min(height - point.y, 2.f); 
-			if (diff > 0)
-				physicsCube.addForce(vec3(0, k*diff, 0), point);
-		}*/
-
 		waterBouyancy.addForces(cubePoints, 8, &bouyCube, &physicsCube);
 
 		physicsCube.force += -physicsCube.v*DAMPING_LINEAR*mass*0.05f + physicsCube.mass*GRAVITY;
@@ -376,24 +327,8 @@ int main(int argc, char* argv[])
 		physicsCube.resolveForces(1.f / 60.f);
 		bouyCube.model_matrix = cube.model_matrix = physicsCube.matrix();
 
-		shipTrackingCam.trackGeometryXZ(cubePoints, 8, cube.model_matrix);
-
 		ris.draw(cam, &water);
 		ris.draw(cam, &cube);
-
-	//	ris.draw(shipTrackingCam, &bouyWater);
-	//	ris.draw(shipTrackingCam, &bouyCube);
-
-/*		fb.useFramebuffer();
-		glClearColor(0.0, 0.0, 0.0, 0.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		ris.draw(shipTrackingCam, &bouyWater);
-		ris.draw(shipTrackingCam, &bouyCube);
-
-		//Get values from framebuffer
-		glBindTexture(GL_TEXTURE_2D, fb.texID);
-		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, renderPos);*/
 
 		ris.useDefaultFramebuffer();
 
