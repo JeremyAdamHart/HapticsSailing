@@ -33,6 +33,8 @@ void RigidBody::resolveForces(float dt){
 	v += force/mass*dt;
 	p += v*dt;
 
+	printf("Force (%.2f, %.2f, %.2f)\n", force.x, force.y, force.z);
+
 	//Rotational integration
 	mat3 IinvWorld = mat3_cast(q)*Iinv*transpose(mat3_cast(q));
 	vec3 ddt_omega = IinvWorld*torque;
@@ -56,7 +58,7 @@ void calculateMeshMassPoints(MeshInfoLoader *geometry, vector<float> *masses, ve
 	float totalArea = 0.f;
 	vector<float> areas;
 
-	for (int i = 0; i < geometry->indices.size() + 2; i+=3){
+	for (int i = 0; i+2 < geometry->indices.size(); i+=3){
 		vec3 p1 = geometry->vertices[geometry->indices[i]];
 		vec3 p2 = geometry->vertices[geometry->indices[i+1]];
 		vec3 p3 = geometry->vertices[geometry->indices[i+2]];
@@ -75,7 +77,7 @@ void calculateMeshMassPoints(MeshInfoLoader *geometry, vector<float> *masses, ve
 	int j = 0;
 	for (int i = 0; i < numPoints; i++){
 
-		while (a > areas[j]){
+		while ((a > areas[j]) && (j < areas.size()-1) ){
 			j++;
 		}
 
@@ -119,10 +121,14 @@ void calculateMeshMassPoints(MeshInfoLoader *geometry, vector<float> *masses, ve
 	Eigen::Matrix<float, 4, 1> c;
 	c << -original_com.x, -original_com.y, -original_com.z, 0.f;
 
-	Eigen::Matrix<float, Eigen::Dynamic, 1> m = P*(P*P.transpose()).inverse()*c;
+//	Eigen::Matrix<float, 4, 4> t1 = P*P.transpose();
+//	Eigen::Matrix<float, Eigen::Dynamic, 4> t2 = P.transpose()*t1.inverse();
+//	Eigen::Matrix<float, Eigen::Dynamic, 1> t3 = t2*c;
+
+	Eigen::Matrix<float, Eigen::Dynamic, 1> m = P.transpose()*(P*P.transpose()).inverse()*c;
 
 	for (int i = 0; i < numPoints; i++){
-		masses->push_back(1.f / float(numPoints) + m(i, 1));
+		masses->push_back(1.f / float(numPoints));	// +m(i, 0));
 	}
 
 }
@@ -131,7 +137,7 @@ mat3 calculateInertialTensor(MeshInfoLoader *geometry, float mass){
 	vector<vec3> points;
 	vector<float> masses;
 
-	const int NUM_POINTS = 1000;
+	const int NUM_POINTS = 5000;
 	calculateMeshMassPoints(geometry, &masses, &points, NUM_POINTS);
 
 	if (masses.size() != points.size())
@@ -140,7 +146,7 @@ mat3 calculateInertialTensor(MeshInfoLoader *geometry, float mass){
 	mat3 inertialTensor(0.f);
 	for (int i = 0; i < points.size(); i++){
 		vec3 p = points[i];
-		float m = masses[i];
+		float m = masses[i]*mass;
 //		mat3 massTensor;
 		float tensor[9] = {
 			m*(p.y*p.y + p.z*p.z), -m*p.y*p.x, -m*p.z*p.x,
@@ -151,3 +157,14 @@ mat3 calculateInertialTensor(MeshInfoLoader *geometry, float mass){
 
 	return inertialTensor;
 }
+
+void RigidBody::addGravityForces() {
+	force += GRAVITY*mass;
+}
+
+void RigidBody::addDampingForces() {
+	force += -v*DAMPING_LINEAR*mass*0.05f;
+	torque += -omega*DAMPING_ANGULAR*mass*mass*0.0001f;
+}
+
+//-0.22352  1.26375

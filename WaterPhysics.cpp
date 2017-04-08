@@ -34,7 +34,7 @@ WaterPhysics::WaterPhysics(Renderer *r, unsigned int width, unsigned int height,
 
 void WaterPhysics::generateRandomWaves() {
 	float posRange = 20.f;
-	float heightRange = 0.5f;
+	float heightRange = 0.2f;
 	float wavelengthRange = 20.f;
 	float speedRange = 0.3f;
 
@@ -45,7 +45,7 @@ void WaterPhysics::generateRandomWaves() {
 			vec2(rand01()*2.f - 1.f, rand01()*2.f - 1.f)*posRange,
 			rand01()*wavelengthRange + 3.0f,
 			rand01()*speedRange + 0.2f,
-			//	0.f));	
+		//		0.f));	
 			rand01()*heightRange));
 	}
 }

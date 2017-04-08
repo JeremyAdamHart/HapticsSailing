@@ -255,8 +255,6 @@ int main(int argc, char* argv[])
 	//Import cube
 	MeshInfoLoader cubeMesh;
 	cubeMesh.loadModel("models/cube.obj");
-	MeshInfoLoader shipCollisionMesh;
-	shipCollisionMesh.loadModel("models/shipCollision.obj");
 
 	float cWidth = 3.f;
 	float cHeight = 1.f;
@@ -273,7 +271,7 @@ int main(int argc, char* argv[])
 	TorranceSparrow cubeMat;
 	Drawable cube(translateMatrix(vec3(0, 5.f, 0)), &cubeMat, &cubeContainer);
 
-	float mass = 2000.f;
+	float mass = 15000;
 	mat3 I = mass/12.f*mat3(vec3(cHeight*cHeight + cDepth*cDepth, 0, 0),
 		vec3(0, cWidth*cWidth + cDepth*cDepth, 0),
 		vec3(0, 0, cWidth*cWidth + cHeight*cHeight));
@@ -282,6 +280,22 @@ int main(int argc, char* argv[])
 	physicsCube.omega = vec3(1, 1, 0);
 	physicsCube.v = vec3(2, 0, 0);
 
+	//SHIP INITIALIZATION
+	MeshInfoLoader shipCollisionMesh;
+	shipCollisionMesh.loadModel("models/shipCollision.obj");
+	RigidBody physicsShip(mass, calculateInertialTensor(&shipCollisionMesh, mass));
+	physicsShip.p = vec3(0, 0.f, 0);
+
+	TorranceSparrow shipMat;
+	MeshInfoLoader shipMesh;
+	shipMesh.loadModel("models/ship.obj");
+	ElementGeometry shipContainer(shipMesh.vertices.data(), shipMesh.normals.data(), 
+		shipMesh.uvs.data(), shipMesh.indices.data(), 
+		shipMesh.vertices.size(), shipMesh.indices.size(), GL_TRIANGLES);
+	Drawable ship(mat4(), &shipMat, &shipContainer);
+
+	PosObject buoyMat;
+	Drawable buoyShip(physicsShip.matrix(), &buoyMat, &shipContainer);
 
 	vec3 cubePoints[] = { 
 		cScale3*vec3(1, 1, 1),
@@ -299,7 +313,7 @@ int main(int argc, char* argv[])
 	PosObject bouyCubeMat;
 	Drawable bouyCube(cube.model_matrix, &bouyCubeMat, &cubeContainer);
 
-	WaterPhysics waterBouyancy(&ris, 20, 20, &timeElapsed);
+	WaterPhysics waterBouyancy(&ris, 80, 80, &timeElapsed);
 
 	//Make water
 	SimpleGeometry waterGeometry(points.data(), points.size(), GL_PATCHES);
@@ -321,7 +335,7 @@ int main(int argc, char* argv[])
 		glClearColor(0.6f, 0.8f, 1.0f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		waterBouyancy.addForces(cubePoints, 8, &bouyCube, &physicsCube);
+		/*waterBouyancy.addForces(cubePoints, 8, &bouyCube, &physicsCube);
 
 		physicsCube.force += -physicsCube.v*DAMPING_LINEAR*mass*0.05f + physicsCube.mass*GRAVITY;
 		physicsCube.torque -= physicsCube.omega*DAMPING_ANGULAR*mass*0.1f;
@@ -329,8 +343,20 @@ int main(int argc, char* argv[])
 		physicsCube.resolveForces(1.f / 60.f);
 		bouyCube.model_matrix = cube.model_matrix = physicsCube.matrix();
 
+		ris.draw(cam, &cube);*/
+
+		waterBouyancy.addForces(shipMesh.vertices.data(), shipMesh.vertices.size(), 
+			&buoyShip, &physicsShip);
+
+		physicsShip.addGravityForces();
+		physicsShip.addDampingForces();
+
+		physicsShip.resolveForces(1.f / 60.f);
+		ship.model_matrix = buoyShip.model_matrix = physicsShip.matrix();
+
+		ris.draw(cam, &ship);
+
 		ris.draw(cam, &water);
-		ris.draw(cam, &cube);
 
 		ris.useDefaultFramebuffer();
 

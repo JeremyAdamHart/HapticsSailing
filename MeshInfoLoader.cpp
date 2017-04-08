@@ -149,6 +149,7 @@ bool MeshInfoLoader::loadModel(char *filename)
 	vector<unsigned int> _nfaces;
 
 	bool noUVs = false;
+	bool noNormals = false;
 
 	while (true)
 	{
@@ -188,10 +189,15 @@ bool MeshInfoLoader::loadModel(char *filename)
 			if ((_uvs.size() == 0) || fscanf(f, "%d/%d/%d %d/%d/%d %d/%d/%d\n",
 				&vi1, &ui1, &ni1, &vi2, &ui2, &ni2, &vi3, &ui3, &ni3) != 9)
 			{
-				if (fscanf(f, "%d//%d %d//%d %d//%d",
+				if ((_normals.size() == 0) || fscanf(f, "%d//%d %d//%d %d//%d",
 					&vi1, &ni1, &vi2, &ni2, &vi3, &ni3) != 6) {
-					printf("Face couldn't be read\n");
-					return false;
+					if (fscanf(f, "%d %d %d", &vi1, &vi2, &vi3) != 3) {
+						printf("Face couldn't be read\n");
+						return false;
+					}
+
+					noNormals = true;
+					noUVs = true;
 				}
 
 				noUVs = true;
@@ -207,21 +213,28 @@ bool MeshInfoLoader::loadModel(char *filename)
 				_uvfaces.push_back(ui3 - 1);
 			}
 
-			_nfaces.push_back(ni1 - 1);
-			_nfaces.push_back(ni2 - 1);
-			_nfaces.push_back(ni3 - 1);
+			if (!noNormals) {
+				_nfaces.push_back(ni1 - 1);
+				_nfaces.push_back(ni2 - 1);
+				_nfaces.push_back(ni3 - 1);
+			}
 		}
 	}
 
 	//void sharedIndices(vector<unsigned int> &_faces, vector<unsigned int> &_nFaces, vector<vec3> &_normals,
 	//					vector<vec3> &vertices, vector<vec3> &normals, vector<unsigned int> &faces)
 
-	if (noUVs){
+	if (noUVs && !noNormals){
 		sharedIndices(_faces, _nfaces, _normals, vertices, normals, indices);
 		uvs.resize(vertices.size(), vec2(0, 0));
 	}
-	else
+	else if(!noNormals)
 		sharedIndices(_faces, _nfaces, _uvfaces, _normals, _uvs, vertices, normals, uvs, indices);
+	if (noUVs && noNormals) {
+		indices = _faces;
+		normals.resize(vertices.size(), vec3(0, 0, 0));
+		uvs.resize(vertices.size(), vec2(0, 0));
+	}
 
 	fclose(f);
 	return true;

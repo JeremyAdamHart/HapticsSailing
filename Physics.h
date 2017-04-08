@@ -30,6 +30,9 @@ public:
 
 	void addForce(glm::vec3 f, glm::vec3 loc);
 	void resolveForces(float dt);
+
+	void addGravityForces();
+	void addDampingForces();
 	glm::mat4 matrix();
 };
 
