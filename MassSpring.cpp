@@ -1,11 +1,13 @@
 #include "MassSpring.h"
+#include "glmSupport.h"
 
-const vec3 GRAVITY(0.f, -9.81f, 0.f);
-const float AIR_DAMPING = 1.f;
+const float AIR_DAMPING = 10.f;
 
 void Mass::resolveForce(float dt) {
-	if (fixed)
+	if (fixed){
+		zeroForce();
 		return;
+	}
 
 	force += GRAVITY*mass - AIR_DAMPING*velocity;
 
@@ -69,7 +71,7 @@ vector<unsigned int> MSSystem::initializeTriangleMassSystem(vec3 p1, vec3 p2, ve
 
 	faces.clear();
 
-	float stretchFactor = 1.0f;
+	float stretchFactor = 0.9f;
 
 	for (int i = 0; i < masses.size(); i++){
 		//First triangle
@@ -77,45 +79,16 @@ vector<unsigned int> MSSystem::initializeTriangleMassSystem(vec3 p1, vec3 p2, ve
 		int i10 = i + columnNum;
 		int i11 = i + columnNum + 1;
 
-/*		//Connect springs
-		if (column < columnNum - 1){
-			Mass *a = &masses[i];
-			Mass *b = &masses[i01];
-			float abDist = length(a->getPosition() - b->getPosition());
-			springs.push_back(Spring(a, b, stiffness , abDist*stretchFactor));
 
-			b = &masses[i10];
-			abDist = length(a->getPosition() - b->getPosition());
-			springs.push_back(Spring(a, b, stiffness , abDist*stretchFactor));
+		faces.push_back(i);
+		faces.push_back(i01);
+		faces.push_back(i10);
 
-			if (column < columnNum - 2){
-				b = &masses[i11];
-				abDist = length(a->getPosition() - b->getPosition());
-				springs.push_back(Spring(a, b, stiffness , abDist*stretchFactor));
-			}
-			if (column != 0){
-				b = &masses[i+columnNum-1];
-				abDist = length(a->getPosition() - b->getPosition());
-				springs.push_back(Spring(a, b, stiffness , abDist*stretchFactor));
-			}
-*/
-			faces.push_back(i);
-			faces.push_back(i01);
+		if (column < columnNum - 2){
 			faces.push_back(i10);
-
-			if (column < columnNum - 2){
-				faces.push_back(i10);
-				faces.push_back(i01);
-				faces.push_back(i11);
-			}
-/*		}
-		else{
-			Mass *a = &masses[i];
-			Mass *b = &masses[i+columnNum-1];
-			float abDist = length(a->getPosition() - b->getPosition());
-			springs.push_back(Spring(a, b, stiffness, abDist*stretchFactor));
+			faces.push_back(i01);
+			faces.push_back(i11);
 		}
-*/
 
 		if (column == columnNum - 2){
 			columnNum--;
@@ -131,7 +104,7 @@ vector<unsigned int> MSSystem::initializeTriangleMassSystem(vec3 p1, vec3 p2, ve
 
 	springs.clear();
 
-	float maxTexDist = sqrt(2.f)*step + 0.00001;
+	float maxTexDist = sqrt(2.f)*2.f*step + 0.00001;
 	
 	for (int i = 0; i < masses.size(); i++){
 		for (int j = i + 1; j < masses.size(); j++){
@@ -143,15 +116,21 @@ vector<unsigned int> MSSystem::initializeTriangleMassSystem(vec3 p1, vec3 p2, ve
 		}
 	}
 
+	calculateNormals();
+
 	return faces;
 }
 
 void MSSystem::solve(float dt) {
+	fixedForces.clear();
+
 	for (int i = 0; i < springs.size(); i++) {
 		springs[i].applySpringForce();
 	}
 
 	for (int i = 0; i < masses.size(); i++) {
+		if (masses[i].isFixed())
+			fixedForces.push_back(MassForce(masses[i].getForce(), i));
 		masses[i].resolveForce(dt);
 	}
 }
@@ -295,6 +274,7 @@ void MSSystem::initializeGridMassSystem(int yNum, int xNum, float width,
 void MSSystem::calculateNormals(){
 	normals.clear();
 	normals.resize(masses.size(), vec3(0.f));
+	areas.resize(masses.size(), 0.f);
 
 	for (int i = 0; i+2 < faces.size(); i+=3){
 		vec3 p1 = masses[faces[i]].getPosition();
@@ -302,10 +282,14 @@ void MSSystem::calculateNormals(){
 		vec3 p3 = masses[faces[i + 2]].getPosition();
 
 		vec3 normal = cross(p2 - p1, p3 - p1);
-		normal = normalize(normal);
+		float magnitude = length(normal);
+		normal = normal/magnitude;
 		normals[faces[i]] += normal;
 		normals[faces[i + 1]] += normal;
 		normals[faces[i + 2]] += normal;
+		areas[faces[i]] += 1.f / 6.f*magnitude;
+		areas[faces[i+1]] += 1.f / 6.f*magnitude;
+		areas[faces[i+2]] += 1.f / 6.f*magnitude;
 	}
 
 	for (int i = 0; i < normals.size(); i++){
@@ -330,4 +314,27 @@ void MSSystem::loadToGeometryContainer(ElementGeometry *geom){
 
 	geom->loadGeometry(geomPositions.data(), normals.data(), geomUvs.data(), faces.data(),
 		geomPositions.size(), faces.size(), GL_DYNAMIC_DRAW);
+
+//	geom->loadGeometry(geomPositions.data(), normals.data(), geomUvs.data(), indices.data(),
+//		geomPositions.size(), indices.size(), GL_DYNAMIC_DRAW);
+}
+
+void MSSystem::applyWindForce(const mat4 &model_matrix, vec3 velocity){
+	vec3 velocity_modelSpace = inverse(toMat3(model_matrix))*velocity;
+
+	float alpha = 0.01f;
+
+	for (int i = 0; i < masses.size(); i++){
+		masses[i].addForce(alpha*areas[i] * dot(velocity_modelSpace, normals[i])*normals[i]);
+	}
+}
+
+void MSSystem::applyForcesToRigidBody(RigidBody *object){
+	for (int i = 0; i < fixedForces.size(); i++){
+		vec3 pos_m = masses[fixedForces[i].massIndex].getPosition();
+		vec3 force = toMat3(object->matrix())*fixedForces[i].force;
+		vec4 position = object->matrix()*vec4(pos_m.x, pos_m.y, pos_m.z, 1.f);
+		
+		object->addForce(force, toVec3(position));
+	}
 }

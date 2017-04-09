@@ -5,6 +5,7 @@
 #include <iterator>
 #include <glm/glm.hpp>
 #include "ElementGeometry.h"
+#include "Physics.h"
 
 using namespace glm;
 using namespace std;
@@ -35,8 +36,11 @@ public:
 
 	const vec3& getPosition() { return position; }
 	const vec3& getVelocity() { return velocity; }
+	const vec3& getForce() { return force; }
+
 	float getRadius() { return radius; }
 	void setFixed(bool newFixed) { fixed = newFixed; }
+	bool isFixed() { return fixed; }
 };	
 
 class Spring {
@@ -58,12 +62,21 @@ public:
 typedef vector<Spring>::iterator SpringIterator;
 typedef vector<Mass>::iterator MassIterator;
 
+struct MassForce{
+	vec3 force;
+	int massIndex;
+
+	MassForce(vec3 force, int massIndex) :force(force), massIndex(massIndex){}
+};
+
 class MSSystem {
 	vector<Mass> masses;
 	vector<Spring> springs;
 	vector<unsigned int> faces;
 	vector<vec3> normals;
 	vector<vec2> texCoords;
+	vector<float> areas;
+	vector<MassForce> fixedForces;
 
 public:
 	enum{POINT_MASS, GRID};
@@ -81,6 +94,8 @@ public:
 
 	void calculateNormals();
 
+	void applyWindForce(const mat4 &model_matrix, vec3 velocity);
+
 	SpringIterator springBegin() { return springs.begin(); }
 	SpringIterator springEnd() { return springs.end(); }
 
@@ -92,4 +107,5 @@ public:
 	size_t numMasses() { return masses.size(); }
 
 	void loadToGeometryContainer(ElementGeometry *geom);
+	void applyForcesToRigidBody(RigidBody *object);
 };

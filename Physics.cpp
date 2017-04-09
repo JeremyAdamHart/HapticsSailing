@@ -121,10 +121,6 @@ void calculateMeshMassPoints(MeshInfoLoader *geometry, vector<float> *masses, ve
 	Eigen::Matrix<float, 4, 1> c;
 	c << -original_com.x, -original_com.y, -original_com.z, 0.f;
 
-//	Eigen::Matrix<float, 4, 4> t1 = P*P.transpose();
-//	Eigen::Matrix<float, Eigen::Dynamic, 4> t2 = P.transpose()*t1.inverse();
-//	Eigen::Matrix<float, Eigen::Dynamic, 1> t3 = t2*c;
-
 	Eigen::Matrix<float, Eigen::Dynamic, 1> m = P.transpose()*(P*P.transpose()).inverse()*c;
 
 	for (int i = 0; i < numPoints; i++){

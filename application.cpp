@@ -281,7 +281,7 @@ int main(int argc, char* argv[])
 	sailMesh.loadModel("models/sail.obj");
 	sailSpring.initializeTriangleMassSystem(
 		sailMesh.vertices[0], sailMesh.vertices[1], sailMesh.vertices[2], 
-		10, 1.f, 1.f);
+		10, 100.f, 1000.f);
 	ElementGeometry sailGeometry;
 //	sailGeometry.mode = GL_LINES;
 	TorranceSparrow sailMat;
@@ -310,6 +310,13 @@ int main(int argc, char* argv[])
 		glClearColor(0.6f, 0.8f, 1.0f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		sailSpring.applyWindForce(sail.model_matrix, vec3(0.f, 0.f, -50.f));
+		sailSpring.solve(1.f / 60.f);
+		sailSpring.calculateNormals();
+		sailSpring.loadToGeometryContainer(&sailGeometry);
+
+		sailSpring.applyForcesToRigidBody(&physicsShip);
+
 		waterBouyancy.addForces(shipMesh.vertices.data(), shipMesh.vertices.size(), 
 			&buoyShip, &physicsShip);
 
@@ -318,10 +325,6 @@ int main(int argc, char* argv[])
 
 		physicsShip.resolveForces(1.f / 60.f);
 		sail.model_matrix = ship.model_matrix = buoyShip.model_matrix = physicsShip.matrix();
-
-		sailSpring.solve(1.f / 1000.f);
-		sailSpring.calculateNormals();
-		sailSpring.loadToGeometryContainer(&sailGeometry);
 
 	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
