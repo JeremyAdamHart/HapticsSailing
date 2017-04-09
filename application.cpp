@@ -293,9 +293,12 @@ int main(int argc, char* argv[])
 	WaterPhysics waterBouyancy(&ris, 80, 80, &timeElapsed);
 
 	//Make water
+	for (int i = 0; i < points.size(); i++){
+		points[i] = toMat3(scaleMatrix(20.f))*points[i];
+	}
 	SimpleGeometry waterGeometry(points.data(), points.size(), GL_PATCHES);
 	ToonWater waterMat(&waterBouyancy.waves, &timeElapsed);
-	Drawable water(scaleMatrix(20.f), &waterMat, &waterGeometry);
+	Drawable water(mat4(), &waterMat, &waterGeometry);
 
 	checkGLErrors("Pre loop");
 
@@ -310,7 +313,7 @@ int main(int argc, char* argv[])
 		glClearColor(0.6f, 0.8f, 1.0f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		sailSpring.applyWindForce(sail.model_matrix, vec3(0.f, 0.f, -50.f));
+		sailSpring.applyWindForce(sail.model_matrix, vec3(0.f, 0.f, -3.f));
 		sailSpring.solve(1.f / 60.f);
 		sailSpring.calculateNormals();
 		sailSpring.loadToGeometryContainer(&sailGeometry);
@@ -325,6 +328,8 @@ int main(int argc, char* argv[])
 
 		physicsShip.resolveForces(1.f / 60.f);
 		sail.model_matrix = ship.model_matrix = buoyShip.model_matrix = physicsShip.matrix();
+		water.model_matrix = translateMatrix(vec3(physicsShip.p.x, 0.f, physicsShip.p.z));
+		cam.center = toVec3(water.model_matrix*toVec4(vec3(0.f), 1.f));
 
 	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 

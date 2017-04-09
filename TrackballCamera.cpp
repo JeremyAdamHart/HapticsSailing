@@ -20,9 +20,9 @@ mat4 rotateAbout(vec3 axis, float radians)
 }
 
 TrackballCamera::TrackballCamera() : dir(vec3(0, 0, -1)), right(vec3(1, 0, 0)), up(vec3(0, 1, 0)),
-pos(vec3(0, 0, 1.f)){}
+pos(vec3(0, 0, 1.f)), center(vec3(0.f)){}
 
-TrackballCamera::TrackballCamera(vec3 _dir, vec3 _pos, const mat4 &projection) :dir(_dir), pos(_pos), projection(projection){
+TrackballCamera::TrackballCamera(vec3 _dir, vec3 _pos, const mat4 &projection) :dir(_dir), pos(_pos), center(vec3(0.f)), projection(projection){
 	right = normalize(cross(dir, vec3(0, -1, 0)));
 	up = normalize(cross(right, dir));
 }
@@ -72,7 +72,7 @@ mat4 TrackballCamera::getCameraMatrix() const
 		vec4(1, 0, 0, 0),
 		vec4(0, 1, 0, 0),
 		vec4(0, 0, 1, 0),
-		vec4(-pos, 1));
+		vec4(-(pos + center), 1));
 
 	return transpose(cameraRotation)*translation;
 }

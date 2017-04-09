@@ -11,6 +11,8 @@ public:
 	vec3 right;
 	vec3 up;
 
+
+	vec3 center;
 	vec3 pos;
 
 	mat4 projection;
