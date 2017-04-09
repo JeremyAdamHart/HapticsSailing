@@ -25,6 +25,7 @@
     <ClCompile Include="ElementGeometry.cpp" />
     <ClCompile Include="glmSupport.cpp" />
     <ClCompile Include="glSupport.cpp" />
+    <ClCompile Include="MassSpring.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MeshInfoLoader.cpp" />
     <ClCompile Include="Physics.cpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="GLGeometry.h" />
     <ClInclude Include="glSupport.h" />
     <ClInclude Include="glmSupport.h" />
+    <ClInclude Include="MassSpring.h" />
     <ClInclude Include="PosTexture.h" />
     <ClInclude Include="TrackerCamera.h" />
     <ClInclude Include="Material.h" />

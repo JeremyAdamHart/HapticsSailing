@@ -24,6 +24,7 @@
 #include "Physics.h"
 #include "PosTexture.h"
 #include "WaterPhysics.h"
+#include "MassSpring.h"
 
 #include <random>
 //------------------------------------------------------------------------------
@@ -252,35 +253,8 @@ int main(int argc, char* argv[])
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
-	//Import cube
-	MeshInfoLoader cubeMesh;
-	cubeMesh.loadModel("models/cube.obj");
-
-	float cWidth = 3.f;
-	float cHeight = 1.f;
-	float cDepth = 3.f;
-	mat4 cScale = scaleMatrix(vec3(cWidth*0.5f, cHeight*0.5f, cDepth*0.5f));
-	mat3 cScale3 = toMat3(cScale); 
-
-	for (int i = 0; i < cubeMesh.vertices.size(); i++){
-		cubeMesh.vertices[i] = cScale3*cubeMesh.vertices[i];
-	}
-
-	ElementGeometry cubeContainer(cubeMesh.vertices.data(), cubeMesh.normals.data(), 
-					cubeMesh.uvs.data(), cubeMesh.indices.data(), cubeMesh.vertices.size(), cubeMesh.indices.size(), GL_TRIANGLES);
-	TorranceSparrow cubeMat;
-	Drawable cube(translateMatrix(vec3(0, 5.f, 0)), &cubeMat, &cubeContainer);
-
-	float mass = 15000;
-	mat3 I = mass/12.f*mat3(vec3(cHeight*cHeight + cDepth*cDepth, 0, 0),
-		vec3(0, cWidth*cWidth + cDepth*cDepth, 0),
-		vec3(0, 0, cWidth*cWidth + cHeight*cHeight));
-	RigidBody physicsCube(mass, I);
-	physicsCube.p = vec3(0, 5.f, 0);
-	physicsCube.omega = vec3(1, 1, 0);
-	physicsCube.v = vec3(2, 0, 0);
-
 	//SHIP INITIALIZATION
+	float mass = 12000;
 	MeshInfoLoader shipCollisionMesh;
 	shipCollisionMesh.loadModel("models/shipCollision.obj");
 	RigidBody physicsShip(mass, calculateInertialTensor(&shipCollisionMesh, mass));
@@ -294,25 +268,28 @@ int main(int argc, char* argv[])
 		shipMesh.vertices.size(), shipMesh.indices.size(), GL_TRIANGLES);
 	Drawable ship(mat4(), &shipMat, &shipContainer);
 
+	ElementGeometry shipCollisionContainer(
+		shipCollisionMesh.vertices.data(), shipCollisionMesh.normals.data(),
+		shipCollisionMesh.uvs.data(), shipCollisionMesh.indices.data(),
+		shipCollisionMesh.vertices.size(), shipCollisionMesh.indices.size(), GL_TRIANGLES);
 	PosObject buoyMat;
-	Drawable buoyShip(physicsShip.matrix(), &buoyMat, &shipContainer);
+	Drawable buoyShip(physicsShip.matrix(), &buoyMat, &shipCollisionContainer);
 
-	vec3 cubePoints[] = { 
-		cScale3*vec3(1, 1, 1),
-		cScale3*vec3(1, 1, -1),
-		cScale3*vec3(1, -1, 1),
-		cScale3*vec3(1, -1, -1),
-		cScale3*vec3(-1, 1, 1),
-		cScale3*vec3(-1, 1, -1),
-		cScale3*vec3(-1, -1, 1),
-		cScale3*vec3(-1, -1, -1) };
+	//SAIL
+	MSSystem sailSpring;
+	MeshInfoLoader sailMesh;
+	sailMesh.loadModel("models/sail.obj");
+	sailSpring.initializeTriangleMassSystem(
+		sailMesh.vertices[0], sailMesh.vertices[1], sailMesh.vertices[2], 
+		10, 1.f, 1.f);
+	ElementGeometry sailGeometry;
+//	sailGeometry.mode = GL_LINES;
+	TorranceSparrow sailMat;
+	sailSpring.loadToGeometryContainer(&sailGeometry);
+	Drawable sail(physicsShip.matrix(), &sailMat, &sailGeometry);
 
-
+	//WATER
 	float timeElapsed = 0.f;
-	//Cube geometry for bouyancy
-	PosObject bouyCubeMat;
-	Drawable bouyCube(cube.model_matrix, &bouyCubeMat, &cubeContainer);
-
 	WaterPhysics waterBouyancy(&ris, 80, 80, &timeElapsed);
 
 	//Make water
@@ -326,24 +303,12 @@ int main(int argc, char* argv[])
     // MAIN GRAPHIC LOOP
     //--------------------------------------------------------------------------
 
-
     // call window size callback at initialization
     windowSizeCallback(window, width, height);
-
 
 	while (!glfwWindowShouldClose(window)){
 		glClearColor(0.6f, 0.8f, 1.0f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		/*waterBouyancy.addForces(cubePoints, 8, &bouyCube, &physicsCube);
-
-		physicsCube.force += -physicsCube.v*DAMPING_LINEAR*mass*0.05f + physicsCube.mass*GRAVITY;
-		physicsCube.torque -= physicsCube.omega*DAMPING_ANGULAR*mass*0.1f;
-
-		physicsCube.resolveForces(1.f / 60.f);
-		bouyCube.model_matrix = cube.model_matrix = physicsCube.matrix();
-
-		ris.draw(cam, &cube);*/
 
 		waterBouyancy.addForces(shipMesh.vertices.data(), shipMesh.vertices.size(), 
 			&buoyShip, &physicsShip);
@@ -352,11 +317,21 @@ int main(int argc, char* argv[])
 		physicsShip.addDampingForces();
 
 		physicsShip.resolveForces(1.f / 60.f);
-		ship.model_matrix = buoyShip.model_matrix = physicsShip.matrix();
+		sail.model_matrix = ship.model_matrix = buoyShip.model_matrix = physicsShip.matrix();
+
+		sailSpring.solve(1.f / 1000.f);
+		sailSpring.calculateNormals();
+		sailSpring.loadToGeometryContainer(&sailGeometry);
+
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		ris.draw(cam, &ship);
 
+		ris.draw(cam, &sail);
+
 		ris.draw(cam, &water);
+
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		ris.useDefaultFramebuffer();
 

@@ -76,6 +76,9 @@
     <ClCompile Include="WaterPhysics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MassSpring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glSupport.h">
@@ -136,6 +139,9 @@
       <Filter>Source Files\Materials</Filter>
     </ClInclude>
     <ClInclude Include="WaterPhysics.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MassSpring.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
