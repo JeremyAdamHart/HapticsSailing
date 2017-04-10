@@ -1,7 +1,7 @@
 #include "MassSpring.h"
 #include "glmSupport.h"
 
-const float AIR_DAMPING = 10.f;
+const float AIR_DAMPING = 0.0f;
 
 void Mass::resolveForce(float dt) {
 	if (fixed){
@@ -49,6 +49,14 @@ void Spring::applySpringForce() {
 
 vector<unsigned int> MSSystem::initializeTriangleMassSystem(vec3 p1, vec3 p2, vec3 p3, int numPoints, float mass, float stiffness){
 
+	masses.clear();
+	springs.clear();
+	normals.clear();
+	texCoords.clear();
+	areas.clear();
+	fixedForces.clear();
+	originalFixedPositions.clear();
+
 	vec3 e1 = p2 - p1;
 	vec3 e2 = p3 - p1;
 
@@ -62,16 +70,25 @@ vector<unsigned int> MSSystem::initializeTriangleMassSystem(vec3 p1, vec3 p2, ve
 		}
 	}
 
-	masses[0].setFixed(true);
+	//Set fixed point variables
+/*	masses[0].setFixed(true);
+	originalFixedPositions.push_back(masses[0].getPosition());
 	masses[numPoints-1].setFixed(true);
+	originalFixedPositions.push_back(masses[numPoints-1].getPosition());*/
+	for (int i = 0; i < numPoints; i++){
+		masses[i].setFixed(true);
+		originalFixedPositions.push_back(masses[i].getPosition());
+	}
+
 	masses.back().setFixed(true);
+	originalFixedPositions.push_back(masses.back().getPosition());
 
 	int columnNum = numPoints;
 	int column = 0;
 
 	faces.clear();
 
-	float stretchFactor = 0.9f;
+	float stretchFactor = 1.0f;
 
 	for (int i = 0; i < masses.size(); i++){
 		//First triangle
@@ -102,9 +119,7 @@ vector<unsigned int> MSSystem::initializeTriangleMassSystem(vec3 p1, vec3 p2, ve
 			break;
 	}
 
-	springs.clear();
-
-	float maxTexDist = sqrt(2.f)*2.f*step + 0.00001;
+	float maxTexDist = 2.f*step + 0.00001;
 	
 	for (int i = 0; i < masses.size(); i++){
 		for (int j = i + 1; j < masses.size(); j++){
@@ -322,19 +337,29 @@ void MSSystem::loadToGeometryContainer(ElementGeometry *geom){
 void MSSystem::applyWindForce(const mat4 &model_matrix, vec3 velocity){
 	vec3 velocity_modelSpace = inverse(toMat3(model_matrix))*velocity;
 
-	float alpha = 0.5f;
+	float alpha = 0.1f;
 
 	for (int i = 0; i < masses.size(); i++){
-		masses[i].addForce(alpha*areas[i] * dot(velocity_modelSpace, normals[i])*normals[i]);
+		masses[i].addForce(alpha*areas[i] * dot(velocity - masses[i].getVelocity(), normals[i])*normals[i]);
 	}
 }
 
 void MSSystem::applyForcesToRigidBody(RigidBody *object){
 	for (int i = 0; i < fixedForces.size(); i++){
 		vec3 pos_m = masses[fixedForces[i].massIndex].getPosition();
-		vec3 force = toMat3(object->matrix())*fixedForces[i].force;
+		vec3 force = fixedForces[i].force;
 		vec4 position = object->matrix()*vec4(pos_m.x, pos_m.y, pos_m.z, 1.f);
 		
-		object->addForce(force, toVec3(position));
+		object->addForce(force, pos_m);
+	}
+}
+
+void MSSystem::transformFixedPoints(const mat4 &model_matrix){
+	int j = 0;
+	for (int i = 0; i < masses.size(); i++){
+		if (masses[i].isFixed()){
+			masses[i].position = toVec3(model_matrix*vec4(originalFixedPositions[j], 1.f));
+			j++;
+		}
 	}
 }

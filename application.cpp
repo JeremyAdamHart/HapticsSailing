@@ -280,7 +280,7 @@ int main(int argc, char* argv[])
 	MeshInfoLoader sailMesh;
 	sailMesh.loadModel("models/sail.obj");
 	sailSpring.initializeTriangleMassSystem(
-		sailMesh.vertices[0], sailMesh.vertices[1], sailMesh.vertices[2], 
+		sailMesh.vertices[0], sailMesh.vertices[2], sailMesh.vertices[1], 
 		10, 100.f, 1000.f);
 	ElementGeometry sailGeometry;
 //	sailGeometry.mode = GL_LINES;
@@ -313,6 +313,8 @@ int main(int argc, char* argv[])
 		glClearColor(0.6f, 0.8f, 1.0f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		sailSpring.transformFixedPoints(physicsShip.matrix());
+
 		sailSpring.applyWindForce(sail.model_matrix, vec3(0.f, 0.f, -3.f));
 		sailSpring.solve(1.f / 60.f);
 		sailSpring.calculateNormals();
@@ -327,7 +329,7 @@ int main(int argc, char* argv[])
 		physicsShip.addDampingForces();
 
 		physicsShip.resolveForces(1.f / 60.f);
-		sail.model_matrix = ship.model_matrix = buoyShip.model_matrix = physicsShip.matrix();
+		 ship.model_matrix = buoyShip.model_matrix = physicsShip.matrix();
 		water.model_matrix = translateMatrix(vec3(physicsShip.p.x, 0.f, physicsShip.p.z));
 		cam.center = toVec3(water.model_matrix*toVec4(vec3(0.f), 1.f));
 

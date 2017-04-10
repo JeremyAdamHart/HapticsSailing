@@ -13,7 +13,6 @@ using namespace std;
 class Mass {
 	float radius;
 	float mass;
-	vec3 position;
 	vec3 velocity;
 	vec3 force;
 
@@ -22,6 +21,8 @@ class Mass {
 	float damping;
 	bool fixed;
 public:
+	vec3 position;
+
 	Mass(vec3 position=vec3(0.0, 0.0, 0.0), bool fixed=false)
 		:position(position), fixed(fixed), velocity(vec3(0.0, 0.0, 0.0)), force(vec3(0.0, 0.0, 0.0)), radius(0.0) {}
 	Mass(float mass, float radius, vec3 position, float damping = 0.0, bool fixed = false) 
@@ -77,6 +78,7 @@ class MSSystem {
 	vector<vec2> texCoords;
 	vector<float> areas;
 	vector<MassForce> fixedForces;
+	vector<vec3> originalFixedPositions;
 
 public:
 	enum{POINT_MASS, GRID};
@@ -91,6 +93,8 @@ public:
 
 	vec3 sphereCollide(vec3 position, float radius);		//Collide system with a spring
 	void solve(float dt);
+
+	void transformFixedPoints(const mat4 &model_matrix);
 
 	void calculateNormals();
 

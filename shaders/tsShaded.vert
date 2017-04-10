@@ -17,7 +17,7 @@ void main()
 {
 
 	FragmentTexCoord = VertexTexCoord;
-	FragmentNormal = (model_matrix*vec4(VertexNormal, 1)).xyz;
+	FragmentNormal = (model_matrix*vec4(VertexNormal, 0)).xyz;
 	ModelPosition = (model_matrix*vec4(VertexPosition, 1)).xyz;
 
     // assign vertex position without modification
