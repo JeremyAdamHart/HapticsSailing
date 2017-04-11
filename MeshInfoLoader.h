@@ -13,6 +13,7 @@ using namespace glm;
 class MeshInfoLoader {
 public:
 	MeshInfoLoader() {};
+	MeshInfoLoader(char* filename);
 
 	bool loadModel(char* filename);
 	void clearData();

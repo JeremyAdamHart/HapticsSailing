@@ -25,11 +25,13 @@
     <ClCompile Include="ElementGeometry.cpp" />
     <ClCompile Include="glmSupport.cpp" />
     <ClCompile Include="glSupport.cpp" />
+    <ClCompile Include="MassSpring.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MeshInfoLoader.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="PosTexture.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Rudder.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SimpleGeometry.cpp" />
     <ClCompile Include="SimpleMaterial.cpp" />
@@ -47,11 +49,13 @@
     <ClInclude Include="GLGeometry.h" />
     <ClInclude Include="glmSupport.h" />
     <ClInclude Include="glSupport.h" />
+    <ClInclude Include="MassSpring.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MeshInfoLoader.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="PosTexture.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Rudder.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SimpleGeometry.h" />
     <ClInclude Include="SimpleMaterial.h" />
@@ -145,6 +149,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>4244;4305;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -228,6 +233,7 @@
       <StringPooling>true</StringPooling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FunctionLevelLinking>false</FunctionLevelLinking>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>

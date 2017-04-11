@@ -16,17 +16,25 @@ ElementGeometry::ElementGeometry(vec3 *positions, vec3 *normals, vec2 *texCoords
 	loadGeometry(positions, normals, texCoords, elements, bufferSize, elementNum);
 }
 
+ElementGeometry::ElementGeometry(MeshInfoLoader *mesh, GLenum mode) 
+	:mode(mode), bufferSize(mesh->vertices.size()), elementNum(mesh->indices.size()) {
+	initializeVAO();
+
+	loadGeometry(mesh->vertices.data(), mesh->normals.data(), mesh->uvs.data(),
+		mesh->indices.data(), mesh->vertices.size(), mesh->indices.size());
+}
+
 void ElementGeometry::loadGeometry(vec3 *positions, vec3 *normals, vec2 *texCoords, unsigned int *elements,
 	size_t _bufferSize, size_t _elementNum, GLenum usage)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[POSITION]);
-	glBufferData(GL_ARRAY_BUFFER, bufferSize * sizeof(vec3), positions, usage);
+	glBufferData(GL_ARRAY_BUFFER, _bufferSize * sizeof(vec3), positions, usage);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[NORMAL]);
-	glBufferData(GL_ARRAY_BUFFER, bufferSize * sizeof(vec3), normals, usage);
+	glBufferData(GL_ARRAY_BUFFER, _bufferSize * sizeof(vec3), normals, usage);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[TEXCOORD]);
-	glBufferData(GL_ARRAY_BUFFER, bufferSize * sizeof(vec2), texCoords, usage);
+	glBufferData(GL_ARRAY_BUFFER, _bufferSize * sizeof(vec2), texCoords, usage);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[ELEMENTS]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementNum*sizeof(unsigned int), elements, usage);

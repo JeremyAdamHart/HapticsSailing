@@ -27,11 +27,14 @@
 #include "MassSpring.h"
 
 #include <random>
+#include <float.h>
 //------------------------------------------------------------------------------
 using namespace chai3d;
 using namespace std;
 using namespace glm;
 //------------------------------------------------------------------------------
+
+//unsigned int fp_control_state = _controlfp(_EM_INEXACT, _MCW_EM);
 
 //------------------------------------------------------------------------------
 // GENERAL SETTINGS
@@ -255,33 +258,28 @@ int main(int argc, char* argv[])
 
 	//SHIP INITIALIZATION
 	float mass = 12000;
-	MeshInfoLoader shipCollisionMesh;
-	shipCollisionMesh.loadModel("models/shipCollision.obj");
+	MeshInfoLoader shipCollisionMesh("models/shipCollision.obj");
 	RigidBody physicsShip(mass, calculateInertialTensor(&shipCollisionMesh, mass));
 	physicsShip.p = vec3(0, 0.f, 0);
 
 	TorranceSparrow shipMat;
-	MeshInfoLoader shipMesh;
-	shipMesh.loadModel("models/ship.obj");
-	ElementGeometry shipContainer(shipMesh.vertices.data(), shipMesh.normals.data(), 
-		shipMesh.uvs.data(), shipMesh.indices.data(), 
-		shipMesh.vertices.size(), shipMesh.indices.size(), GL_TRIANGLES);
+	MeshInfoLoader shipMesh("models/ship.obj");
+	ElementGeometry shipContainer(&shipMesh, GL_TRIANGLES);
 	Drawable ship(mat4(), &shipMat, &shipContainer);
 
-	ElementGeometry shipCollisionContainer(
-		shipCollisionMesh.vertices.data(), shipCollisionMesh.normals.data(),
-		shipCollisionMesh.uvs.data(), shipCollisionMesh.indices.data(),
-		shipCollisionMesh.vertices.size(), shipCollisionMesh.indices.size(), GL_TRIANGLES);
+	ElementGeometry shipCollisionContainer(&shipCollisionMesh, GL_TRIANGLES);
 	PosObject buoyMat;
 	Drawable buoyShip(physicsShip.matrix(), &buoyMat, &shipCollisionContainer);
 
+	MeshInfoLoader rudderGeometry("models/rudder.obj");
+
+
 	//SAIL
 	MSSystem sailSpring;
-	MeshInfoLoader sailMesh;
-	sailMesh.loadModel("models/sail.obj");
+	MeshInfoLoader sailMesh ("models/sail.obj");
 	sailSpring.initializeTriangleMassSystem(
 		sailMesh.vertices[0], sailMesh.vertices[2], sailMesh.vertices[1], 
-		10, 100.f, 1000.f);
+		10, 100.f, 2000.f);
 	ElementGeometry sailGeometry;
 //	sailGeometry.mode = GL_LINES;
 	TorranceSparrow sailMat;
@@ -315,7 +313,7 @@ int main(int argc, char* argv[])
 
 		sailSpring.transformFixedPoints(physicsShip.matrix());
 
-		sailSpring.applyWindForce(sail.model_matrix, vec3(0.f, 0.f, -3.f));
+		sailSpring.applyWindForce(sail.model_matrix, vec3(0.f, 0.f, -30.f));
 		sailSpring.solve(1.f / 60.f);
 		sailSpring.calculateNormals();
 		sailSpring.loadToGeometryContainer(&sailGeometry);
@@ -522,6 +520,8 @@ void updateHaptics(void)
         cVector3d force(0, 0, 0);
         cVector3d torque(0, 0, 0);
         double gripperForce = 0.0;
+
+//		printf("p(%f, %f, %f)\n", position.x(), position.y(), position.z());
 
 
         /////////////////////////////////////////////////////////////////////

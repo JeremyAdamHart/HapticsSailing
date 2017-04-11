@@ -5,6 +5,7 @@
 #include <chai3d.h>
 #include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
+#include "MeshInfoLoader.h"
 
 using namespace glm;
 
@@ -24,6 +25,8 @@ public:
 	ElementGeometry(GLenum mode = GL_TRIANGLES);
 	ElementGeometry(vec3 *positions, vec3 *normals, vec2 *texCoords, unsigned int *elements,
 					size_t bufferSize, size_t elementNum, GLenum mode = GL_TRIANGLES);
+
+	ElementGeometry(MeshInfoLoader *mesh, GLenum mode = GL_TRIANGLES);
 
 	void loadGeometry(vec3 *positions, vec3 *normals, vec2 *texCoords, unsigned int *elements,
 					size_t _bufferSize, size_t _elementNum, GLenum usage=GL_STATIC_DRAW);

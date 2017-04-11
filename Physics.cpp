@@ -33,7 +33,7 @@ void RigidBody::resolveForces(float dt){
 	v += force/mass*dt;
 	p += v*dt;
 
-	printf("Force (%.2f, %.2f, %.2f)\n", force.x, force.y, force.z);
+	//printf("Force (%.2f, %.2f, %.2f)\n", force.x, force.y, force.z);
 
 	//Rotational integration
 	mat3 IinvWorld = mat3_cast(q)*Iinv*transpose(mat3_cast(q));

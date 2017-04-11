@@ -1,7 +1,7 @@
 #include "MassSpring.h"
 #include "glmSupport.h"
 
-const float AIR_DAMPING = 0.0f;
+const float AIR_DAMPING = 1.0f;
 
 void Mass::resolveForce(float dt) {
 	if (fixed){
@@ -36,8 +36,11 @@ void Spring::applySpringForce() {
 	vec3 ab = b->getPosition() - a->getPosition();
 	float slength = length(ab);
 
-	vec3 forceDir = ab / slength;
+	vec3 forceDir = (slength > 0.0001) ? ab / slength: vec3(0.f);
 	float forceMagnitude = stiffness*(slength - restLength);
+
+	if (forceMagnitude > 10000.f)
+		forceMagnitude = 10000.f;
 
 	//Spring damping
 	vec3 aDamping = -damping*dot(forceDir, a->getVelocity())*forceDir;
@@ -66,20 +69,19 @@ vector<unsigned int> MSSystem::initializeTriangleMassSystem(vec3 p1, vec3 p2, ve
 	for (float u = 0.f; u < 1.000001f; u+=step){
 		for (float v = 0.f; u + v < 1.000001f; v+= step){
 			masses.push_back(Mass(iMass, p1 + e1*u + e2*v));
+			if (false)	{//(u == 0.f) || (v == 0.f)) {
+				masses.back().setFixed(true);
+				originalFixedPositions.push_back(masses.back().getPosition());
+			}
 			texCoords.push_back(vec2(u, v));
 		}
 	}
 
 	//Set fixed point variables
-/*	masses[0].setFixed(true);
+	masses[0].setFixed(true);
 	originalFixedPositions.push_back(masses[0].getPosition());
 	masses[numPoints-1].setFixed(true);
-	originalFixedPositions.push_back(masses[numPoints-1].getPosition());*/
-	for (int i = 0; i < numPoints; i++){
-		masses[i].setFixed(true);
-		originalFixedPositions.push_back(masses[i].getPosition());
-	}
-
+	originalFixedPositions.push_back(masses[numPoints-1].getPosition());
 	masses.back().setFixed(true);
 	originalFixedPositions.push_back(masses.back().getPosition());
 
@@ -289,6 +291,7 @@ void MSSystem::initializeGridMassSystem(int yNum, int xNum, float width,
 void MSSystem::calculateNormals(){
 	normals.clear();
 	normals.resize(masses.size(), vec3(0.f));
+	areas.clear();
 	areas.resize(masses.size(), 0.f);
 
 	for (int i = 0; i+2 < faces.size(); i+=3){
@@ -298,7 +301,8 @@ void MSSystem::calculateNormals(){
 
 		vec3 normal = cross(p2 - p1, p3 - p1);
 		float magnitude = length(normal);
-		normal = normal/magnitude;
+		if(magnitude > 0.001)
+			normal = normal/magnitude;
 		normals[faces[i]] += normal;
 		normals[faces[i + 1]] += normal;
 		normals[faces[i + 2]] += normal;
@@ -337,9 +341,12 @@ void MSSystem::loadToGeometryContainer(ElementGeometry *geom){
 void MSSystem::applyWindForce(const mat4 &model_matrix, vec3 velocity){
 	vec3 velocity_modelSpace = inverse(toMat3(model_matrix))*velocity;
 
-	float alpha = 0.1f;
+	float alpha = 20.f;
 
 	for (int i = 0; i < masses.size(); i++){
+		vec3 relativeVelocity = velocity - masses[i].getVelocity();
+		float dotResult = dot(relativeVelocity, normals[i]);
+		vec3 forceValue = alpha*areas[i] * dot(velocity - masses[i].getVelocity(), normals[i])*normals[i];
 		masses[i].addForce(alpha*areas[i] * dot(velocity - masses[i].getVelocity(), normals[i])*normals[i]);
 	}
 }
@@ -350,6 +357,7 @@ void MSSystem::applyForcesToRigidBody(RigidBody *object){
 		vec3 force = fixedForces[i].force;
 		vec4 position = object->matrix()*vec4(pos_m.x, pos_m.y, pos_m.z, 1.f);
 		
+		printf("force (%f, %f, %f)\n", force.x, force.y, force.z);
 		object->addForce(force, pos_m);
 	}
 }
