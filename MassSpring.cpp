@@ -342,7 +342,7 @@ void MSSystem::applyWindForce(const mat4 &model_matrix, vec3 velocity){
 	vec3 velocity_modelSpace = inverse(toMat3(model_matrix))*velocity;
 
 	float alpha = 20.f;
-	alpha = 40.f;
+	alpha = 60.f;
 
 	for (int i = 0; i < masses.size(); i++){
 		vec3 relativeVelocity = velocity - masses[i].getVelocity();

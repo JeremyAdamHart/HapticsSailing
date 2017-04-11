@@ -130,7 +130,11 @@ TrackballCamera* activeCamera = NULL;
 bool leftMouseDown = false;
 bool rightMouseDown = false;
 
-vec3 toolPos = vec3(0.f, 0.f, 0.f);
+vec3 toolPos = vec3(0.f, 0.f, 0.f);		//Make local
+
+//GLOBALS
+
+
 
 static float rand01() { return float(rand()) / float(RAND_MAX); }
 
@@ -317,16 +321,16 @@ int main(int argc, char* argv[])
 		glClearColor(0.6f, 0.8f, 1.0f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		//PUT IN HAPTICS LOOPvvvvvvvvvvvvvvvvvvvv
 		rudder.calculateRudderDirection(toolPos, 0.05);
 
 		rudder.applyForce(&physicsShip);
 
 		sailSpring.transformFixedPoints(physicsShip.matrix());
 
-		sailSpring.applyWindForce(sail.model_matrix, vec3(0.f, 0.f, -30.f));
+		sailSpring.applyWindForce(sail.model_matrix, vec3(0.f, 0.f, -12.f));
 		sailSpring.solve(1.f / 60.f);
 		sailSpring.calculateNormals();
-		sailSpring.loadToGeometryContainer(&sailGeometry);
 
 		sailSpring.applyForcesToRigidBody(&physicsShip);
 
@@ -338,14 +342,19 @@ int main(int argc, char* argv[])
 
 		physicsShip.resolveForces(1.f / 60.f);
 		 ship.model_matrix = buoyShip.model_matrix = physicsShip.matrix();
+
+		//^^^^^^^^^^^^^^^^
+
+		//Update matrices
 		water.model_matrix = translateMatrix(vec3(physicsShip.p.x, 0.f, physicsShip.p.z));
-		cam.center = toVec3(water.model_matrix*toVec4(vec3(0.f), 1.f));
-
-		printf("Velocity(%f, %f, %f)\n", physicsShip.v.x, physicsShip.v.y, physicsShip.v.z);
-
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		ship.model_matrix = physicsShip.matrix();
 		rudder.updateModelMatrix(physicsShip.matrix());
 
+		cam.center = toVec3(water.model_matrix*toVec4(vec3(0.f), 1.f));
+
+		sailSpring.loadToGeometryContainer(&sailGeometry);
+	
+		//Draw scene
 		ris.draw(cam, &ship);
 
 		ris.draw(cam, &sail);
@@ -354,8 +363,6 @@ int main(int argc, char* argv[])
 		
 		ris.draw(cam, &rudder.rudderDrawable);
 		ris.draw(cam, &rudder.handleDrawable);
-
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		ris.useDefaultFramebuffer();
 
