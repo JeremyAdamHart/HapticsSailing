@@ -342,6 +342,7 @@ void MSSystem::applyWindForce(const mat4 &model_matrix, vec3 velocity){
 	vec3 velocity_modelSpace = inverse(toMat3(model_matrix))*velocity;
 
 	float alpha = 20.f;
+	alpha = 40.f;
 
 	for (int i = 0; i < masses.size(); i++){
 		vec3 relativeVelocity = velocity - masses[i].getVelocity();
@@ -356,8 +357,7 @@ void MSSystem::applyForcesToRigidBody(RigidBody *object){
 		vec3 pos_m = masses[fixedForces[i].massIndex].getPosition();
 		vec3 force = fixedForces[i].force;
 		vec4 position = object->matrix()*vec4(pos_m.x, pos_m.y, pos_m.z, 1.f);
-		
-		printf("force (%f, %f, %f)\n", force.x, force.y, force.z);
+
 		object->addForce(force, pos_m);
 	}
 }

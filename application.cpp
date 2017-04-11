@@ -130,7 +130,10 @@ TrackballCamera* activeCamera = NULL;
 bool leftMouseDown = false;
 bool rightMouseDown = false;
 
+vec3 toolPos = vec3(0.f, 0.f, 0.f);
+
 static float rand01() { return float(rand()) / float(RAND_MAX); }
+
 
 //==============================================================================
 /*
@@ -314,6 +317,10 @@ int main(int argc, char* argv[])
 		glClearColor(0.6f, 0.8f, 1.0f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		rudder.calculateRudderDirection(toolPos, 0.05);
+
+		rudder.applyForce(&physicsShip);
+
 		sailSpring.transformFixedPoints(physicsShip.matrix());
 
 		sailSpring.applyWindForce(sail.model_matrix, vec3(0.f, 0.f, -30.f));
@@ -334,8 +341,9 @@ int main(int argc, char* argv[])
 		water.model_matrix = translateMatrix(vec3(physicsShip.p.x, 0.f, physicsShip.p.z));
 		cam.center = toVec3(water.model_matrix*toVec4(vec3(0.f), 1.f));
 
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		printf("Velocity(%f, %f, %f)\n", physicsShip.v.x, physicsShip.v.y, physicsShip.v.z);
 
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		rudder.updateModelMatrix(physicsShip.matrix());
 
 		ris.draw(cam, &ship);
@@ -529,7 +537,9 @@ void updateHaptics(void)
         cVector3d torque(0, 0, 0);
         double gripperForce = 0.0;
 
-//		printf("p(%f, %f, %f)\n", position.x(), position.y(), position.z());
+		toolPos = vec3(position.y(), position.z(), position.x());
+
+//		printf("p(%f, %f, %f)\n", position.y(), position.z(), position.x());
 
 
         /////////////////////////////////////////////////////////////////////

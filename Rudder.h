@@ -19,7 +19,6 @@ class RudderPhysics {
 	glm::vec3 rudderDirection;
 
 	void calculatePivotPoint();
-	void calculateRudderDirection(glm::vec3 handle, float dimension);
 
 public:
 	Drawable rudderDrawable;
@@ -27,6 +26,7 @@ public:
 
 	RudderPhysics(char *rudderObj, char *handleObj, char *pivotObj);
 	
+	void calculateRudderDirection(glm::vec3 handle, float dimension);
 	void updateModelMatrix(const glm::mat4 &model_matrix);	//Boat's model matrix
 
 	void applyForce(RigidBody *object);
