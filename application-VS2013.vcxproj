@@ -30,6 +30,7 @@
     <ClCompile Include="MeshInfoLoader.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="PosTexture.cpp" />
+    <ClCompile Include="Rudder.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="TrackerCamera.cpp" />
     <ClCompile Include="SimpleMaterial.cpp" />
@@ -50,6 +51,7 @@
     <ClInclude Include="glmSupport.h" />
     <ClInclude Include="MassSpring.h" />
     <ClInclude Include="PosTexture.h" />
+    <ClInclude Include="Rudder.h" />
     <ClInclude Include="TrackerCamera.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MeshInfoLoader.h" />

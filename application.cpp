@@ -25,6 +25,7 @@
 #include "PosTexture.h"
 #include "WaterPhysics.h"
 #include "MassSpring.h"
+#include "Rudder.h"
 
 #include <random>
 #include <float.h>
@@ -286,6 +287,8 @@ int main(int argc, char* argv[])
 	sailSpring.loadToGeometryContainer(&sailGeometry);
 	Drawable sail(physicsShip.matrix(), &sailMat, &sailGeometry);
 
+	RudderPhysics rudder("models/rudder.obj", "models/handle.obj", "models/pivotPoint.obj");
+
 	//WATER
 	float timeElapsed = 0.f;
 	WaterPhysics waterBouyancy(&ris, 80, 80, &timeElapsed);
@@ -333,11 +336,16 @@ int main(int argc, char* argv[])
 
 	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+		rudder.updateModelMatrix(physicsShip.matrix());
+
 		ris.draw(cam, &ship);
 
 		ris.draw(cam, &sail);
 
 		ris.draw(cam, &water);
+		
+		ris.draw(cam, &rudder.rudderDrawable);
+		ris.draw(cam, &rudder.handleDrawable);
 
 	//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

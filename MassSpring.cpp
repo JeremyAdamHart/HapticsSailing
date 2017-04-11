@@ -327,7 +327,7 @@ void MSSystem::loadToGeometryContainer(ElementGeometry *geom){
 	}
 
 	for (int i = 0; i < springs.size(); i++){
-		indices.push_back(springs[i].a - masses.data());
+        		indices.push_back(springs[i].a - masses.data());
 		indices.push_back(springs[i].b - masses.data());
 	}
 
