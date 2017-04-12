@@ -138,6 +138,21 @@ vector<unsigned int> MSSystem::initializeTriangleMassSystem(vec3 p1, vec3 p2, ve
 	return faces;
 }
 
+void MSSystem::calculateSpringForces() {
+	fixedForces.clear();
+
+	for (int i = 0; i < springs.size(); i++)
+		springs[i].applySpringForce();	
+}
+
+void MSSystem::resolveForces(float dt) {
+	for (int i = 0; i < masses.size(); i++) {
+		if (masses[i].isFixed())
+			fixedForces.push_back(MassForce(masses[i].getForce(), i));
+		masses[i].resolveForce(dt);
+	}
+}
+
 void MSSystem::solve(float dt) {
 	fixedForces.clear();
 

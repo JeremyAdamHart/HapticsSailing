@@ -79,10 +79,13 @@
     <ClCompile Include="WaveFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MassSpring.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Rudder.cpp">
+      <Filter>Source Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="BoomPhysics.cpp">
+      <Filter>Source Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="MassSpring.cpp">
       <Filter>Source Files\Physics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -147,10 +150,13 @@
     <ClInclude Include="WaveFunction.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="MassSpring.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Rudder.h">
+      <Filter>Source Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="BoomPhysics.h">
+      <Filter>Source Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="MassSpring.h">
       <Filter>Source Files\Physics</Filter>
     </ClInclude>
   </ItemGroup>

@@ -19,20 +19,28 @@ class Boom {
 	glm::vec3 boomPosition;
 	float boomVelocity;
 	float boomLength;
+	float boomForce;
 
 	glm::vec3 ropePoint;
 	float ropeLength;
+
+	float handleRange;
 
 	glm::vec3 handlePoint;
 
 public:
 	Drawable boomDrawable;
 	Drawable ropeDrawable;
+	Drawable sheetDrawable;
 
 	Boom(char *boomObj, char *ropeObj, char *pivotObj, char *ropePointObj);
 
 	void updateModelMatrix(const glm::mat4 &model_matrix);	//Boat's model matrix
-	void calculateBoomPosition(glm::vec3 handle, float dimension, float dt);
+	void calculateBoomPosition(float dt);
 
-	glm::vec3 getForce();
+	void addForceToBoom(glm::vec3 force);
+
+	vec3 getBoomEndpointWorld();
+
+	glm::vec3 updateHandleAndGetForce(glm::vec3 handle, float dimension);
 };

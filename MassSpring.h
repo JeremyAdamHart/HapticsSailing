@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include "ElementGeometry.h"
 #include "Physics.h"
+#include "BoomPhysics.h"
 
 using namespace glm;
 using namespace std;
@@ -92,6 +93,8 @@ public:
 	vector<unsigned int> initializeTriangleMassSystem(vec3 p1, vec3 p2, vec3 p3, int numPoints, float mass, float stiffness);
 
 	vec3 sphereCollide(vec3 position, float radius);		//Collide system with a spring
+	void calculateSpringForces();
+	void resolveForces(float dt);
 	void solve(float dt);
 
 	void transformFixedPoints(const mat4 &model_matrix);
@@ -112,4 +115,7 @@ public:
 
 	void loadToGeometryContainer(ElementGeometry *geom);
 	void applyForcesToRigidBody(RigidBody *object);
+	void applyForceToBoom(Boom *boom);
+	void setBoomEndPoint(glm::vec3 boomPosition);
+	glm::vec3 getBoomForce();
 };

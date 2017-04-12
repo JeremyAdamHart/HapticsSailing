@@ -77,6 +77,10 @@ cHapticDeviceHandler* handler;
 // a pointer to the current haptic device
 cGenericHapticDevicePtr hapticDevice;
 
+cHapticDeviceHandler *bHandler;
+cGenericHapticDevicePtr bHapticDevice;
+
+
 // flag to indicate if the haptic simulation currently running
 bool simulationRunning = false;
 
@@ -130,8 +134,6 @@ void close(void);
 TrackballCamera* activeCamera = NULL;
 bool leftMouseDown = false;
 bool rightMouseDown = false;
-
-vec3 toolPos = vec3(0.f, 0.f, 0.f);		//Make local
 
 //GLOBALS
 RigidBody *physicsShip;
@@ -234,14 +236,26 @@ int main(int argc, char* argv[])
     hapticDevice->open();
 
     // calibrate device (if necessary)
-    hapticDevice->calibrate();
+	if (hapticDevice->calibrate())
+		printf("First device calibrated\n");
 
     // retrieve information about the current haptic device
     cHapticDeviceInfo info = hapticDevice->getSpecifications();
 
+	printf("Device num = %d\n", handler->getNumDevices());
 
     // if the device has a gripper, enable the gripper to simulate a user switch
     hapticDevice->setEnableGripperUserSwitch(true);
+
+	//Create haptic device handler for boom
+	if (handler->getDevice(bHapticDevice, 1))
+		printf("Second device connected\n");
+
+	if (bHapticDevice->open())
+		printf("Second device opened\n");
+	if (bHapticDevice->calibrate())
+		printf("Second device calibrated\n");
+	bHapticDevice->setEnableGripperUserSwitch(true);
 
 
     //--------------------------------------------------------------------------
@@ -356,6 +370,8 @@ int main(int argc, char* argv[])
 		ris.draw(cam, &rudder->handleDrawable);
 
 		ris.draw(cam, &boom->boomDrawable);
+		ris.draw(cam, &boom->sheetDrawable);
+		ris.draw(cam, &boom->ropeDrawable);
 
 		graphicsRate.signal(1);
 
@@ -374,6 +390,10 @@ int main(int argc, char* argv[])
     // exit
     return 0;
 }
+//vec3 toolPos = vec3(position.y(), position.z(), position.x());
+
+cVector3d toCVector3d(vec3 v) { return cVector3d(v.z, v.x, v.y); }
+vec3 toVec3(cVector3d v) { return vec3(v.y(), v.z(), v.x()); }
 
 //--------------------------------------------------------------------------------
 
@@ -415,6 +435,11 @@ void updateHaptics(void)
 	cPrecisionClock timer;
 	timer.start();
 
+	vec3 prevForceA(0.f);
+	vec3 prevForceB(0.f);
+
+	const float MAX_FORCE_DIFF = 1000.f;
+
 	// main haptic simulation loop
 	while (simulationRunning)
 	{
@@ -430,9 +455,15 @@ void updateHaptics(void)
 		cMatrix3d rotation;
 		hapticDevice->getRotation(rotation);
 
+		cVector3d bPosition;
+		bHapticDevice->getPosition(bPosition);
+
 		// read user-switch status (button 0)
 		bool button = false;
 		hapticDevice->getUserSwitch(0, button);
+
+		vec3 toolPos = toVec3(position);	// vec3(position.y(), position.z(), position.x());
+		vec3 bToolPos = toVec3(bPosition);	// vec3(bPosition.y(), bPosition.z(), bPosition.x());
 
 		//////////////////////////////////////////////////////////////////////
 		// RUN SIMULATION
@@ -440,6 +471,10 @@ void updateHaptics(void)
 
 		double frameTime = timer.getCurrentTimeSeconds();
 		timer.reset();
+
+		vec3 boomForce = boom->updateHandleAndGetForce(bToolPos, 0.05)/50.f;
+		boom->calculateBoomPosition(frameTime/100.f);
+//		sailSpring->
 
 		rudder->calculateRudderDirection(toolPos, 0.05);
 
@@ -468,14 +503,14 @@ void updateHaptics(void)
 		// COMPUTE FORCES
 		/////////////////////////////////////////////////////////////////////
 
+		float boomForceDiff = length(boomForce - prevForceB);
+		if (boomForceDiff > MAX_FORCE_DIFF)
+			boomForce = prevForceB + normalize(boomForce - prevForceB)*MAX_FORCE_DIFF;
+//		printf("Force (%f, %f, %f)\n", boomForce.x, boomForce.y, boomForce.z);
+
 		cVector3d force(0, 0, 0);
 		cVector3d torque(0, 0, 0);
 		double gripperForce = 0.0;
-
-		toolPos = vec3(position.y(), position.z(), position.x());
-
-		//		printf("p(%f, %f, %f)\n", position.y(), position.z(), position.x());
-
 
 		/////////////////////////////////////////////////////////////////////
 		// APPLY FORCES
@@ -483,6 +518,7 @@ void updateHaptics(void)
 
 		// send computed force, torque, and gripper force to haptic device
 		hapticDevice->setForceAndTorqueAndGripperForce(force, torque, gripperForce);
+		bHapticDevice->setForceAndTorqueAndGripperForce(toCVector3d(boomForce), torque, gripperForce);
 
 		// signal frequency counter
 		hapticsRate.signal(1);
