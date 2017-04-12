@@ -16,7 +16,8 @@ class Boom {
 	TorranceSparrow ropeMat;
 
 	glm::vec3 pivotPoint;
-	glm::vec3 boomDirection;
+	glm::vec3 boomPosition;
+	float boomVelocity;
 	float boomLength;
 
 	glm::vec3 ropePoint;
@@ -28,10 +29,10 @@ public:
 	Drawable boomDrawable;
 	Drawable ropeDrawable;
 
-	Boom(char *boomObj, char *ropeObj, char *pivotObj);
+	Boom(char *boomObj, char *ropeObj, char *pivotObj, char *ropePointObj);
 
 	void updateModelMatrix(const glm::mat4 &model_matrix);	//Boat's model matrix
-	void calculateBoomPosition(glm::vec3 handle, float dimension);
+	void calculateBoomPosition(glm::vec3 handle, float dimension, float dt);
 
 	glm::vec3 getForce();
 };

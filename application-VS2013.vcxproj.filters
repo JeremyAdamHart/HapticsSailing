@@ -85,6 +85,9 @@
     <ClCompile Include="WaterPhysics.cpp">
       <Filter>Source Files\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="BoomPhysics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glSupport.h">
@@ -152,6 +155,9 @@
     </ClInclude>
     <ClInclude Include="WaterPhysics.h">
       <Filter>Source Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="BoomPhysics.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

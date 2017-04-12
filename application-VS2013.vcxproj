@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
+    <ClCompile Include="BoomPhysics.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="ElementGeometry.cpp" />
@@ -43,6 +44,7 @@
     <ClCompile Include="WaveFunction.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BoomPhysics.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="ElementGeometry.h" />

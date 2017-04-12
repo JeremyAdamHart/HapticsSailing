@@ -26,6 +26,7 @@
 #include "WaterPhysics.h"
 #include "MassSpring.h"
 #include "Rudder.h"
+#include "BoomPhysics.h"
 
 #include <random>
 #include <float.h>
@@ -135,6 +136,7 @@ vec3 toolPos = vec3(0.f, 0.f, 0.f);		//Make local
 //GLOBALS
 RigidBody *physicsShip;
 RudderPhysics *rudder;
+Boom *boom;
 MSSystem *sailSpring;
 vector<WaveFunction> *waves;
 
@@ -288,7 +290,7 @@ int main(int argc, char* argv[])
 	TorranceSparrow sailMat;
 	sailSpring->loadToGeometryContainer(&sailGeometry);
 	sail = new Drawable(mat4(), &sailMat, &sailGeometry);
-
+	boom = new Boom("models/boom.obj", "models/rope.obj", "models/boomPivot.obj", "models/ropePoint.obj");
 	rudder = new RudderPhysics("models/rudder.obj", "models/handle.obj", "models/pivotPoint.obj");
 
 	//WATER
@@ -335,6 +337,7 @@ int main(int argc, char* argv[])
 		water.model_matrix = translateMatrix(vec3(physicsShip->p.x, 0.f, physicsShip->p.z));
 		ship.model_matrix = physicsShip->matrix();
 		rudder->updateModelMatrix(physicsShip->matrix());
+		boom->updateModelMatrix(physicsShip->matrix());
 
 		cam.center = toVec3(water.model_matrix*toVec4(vec3(0.f), 1.f));
 
@@ -351,6 +354,8 @@ int main(int argc, char* argv[])
 		
 		ris.draw(cam, &rudder->rudderDrawable);
 		ris.draw(cam, &rudder->handleDrawable);
+
+		ris.draw(cam, &boom->boomDrawable);
 
 		graphicsRate.signal(1);
 
