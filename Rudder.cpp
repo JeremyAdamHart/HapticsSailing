@@ -31,7 +31,6 @@ void RudderPhysics::applyForce(RigidBody *object)
 
 	vec3 force = dot(object->v, normalize(normal_worldspace))
 		*normal_worldspace*50000.f;
-	printf("Force (%f, %f, %f)\n", force.x, force.y, force.z);
 
 	object->addForce(-force, position_worldspace);
 }

@@ -44,10 +44,14 @@ void ElementGeometry::loadGeometry(vec3 *positions, vec3 *normals, vec2 *texCoor
 }
 
 bool ElementGeometry::initializeVAO() {
+	checkGLErrors("-1");
+
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(COUNT, vbo);
 
 	glBindVertexArray(vao);
+
+	checkGLErrors("0");
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[POSITION]);
@@ -60,6 +64,8 @@ bool ElementGeometry::initializeVAO() {
 		(void*)0			//Offset
 	);
 
+	checkGLErrors("1");
+
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[NORMAL]);
 	glVertexAttribPointer(
@@ -70,6 +76,8 @@ bool ElementGeometry::initializeVAO() {
 		sizeof(vec3),		//Stride
 		(void*)0			//Offset
 	);
+
+	checkGLErrors("2");
 
 	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[TEXCOORD]);
@@ -84,7 +92,7 @@ bool ElementGeometry::initializeVAO() {
 
 	glBindVertexArray(0);
 
-	return !checkGLErrors("initVao");
+	return !checkGLErrors("ElementGeometry::initVao");
 }
 
 

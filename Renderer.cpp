@@ -157,6 +157,27 @@ Renderer::Renderer():window(NULL){
 	
 }
 
+GLFWwindow* Renderer::createWindowChild(GLFWwindow* parent, int width, int height) {
+	// set OpenGL version
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+
+	GLFWwindow *childWindow = glfwCreateWindow(width, height, "HapticsSailing", NULL, parent);
+	if (!childWindow)
+	{
+		cout << "failed to create window" << endl;
+		glfwTerminate();
+		return NULL;
+	}
+
+	checkGLErrors("Window creation");
+
+	return childWindow;
+}
+
 GLFWwindow* Renderer::createWindow(int width, int height){
 	// initialize GLFW library
 	if (!glfwInit())

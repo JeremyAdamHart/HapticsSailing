@@ -38,7 +38,7 @@ bool SimpleGeometry::initializeVAO(){
 
 	glBindVertexArray(0);
 
-	return !checkGLErrors("initVao");
+	return !checkGLErrors("SimpleGeometry::initVao");
 }
 
 void SimpleGeometry::loadGeometry(vec3 *positions, size_t elementNum)

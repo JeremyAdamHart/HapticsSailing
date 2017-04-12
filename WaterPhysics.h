@@ -36,7 +36,9 @@ public:
 	WaterPhysics(Renderer *r, unsigned int width=20, unsigned int height=20, float *timeElapsed=NULL);
 
 	void addForces(glm::vec3 *vertices, size_t numVertices, Drawable *dObject, 
-		RigidBody *pObject);		//UGLY should have subclassed
+		RigidBody *pObject);		//Ugly should have subclassed
 
-	void generateRandomWaves();
+	void setRenderer(Renderer *newRenderer) { r = newRenderer; }
 };
+
+vector<WaveFunction> generateRandomWaves();

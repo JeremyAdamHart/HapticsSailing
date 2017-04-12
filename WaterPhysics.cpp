@@ -29,14 +29,16 @@ WaterPhysics::WaterPhysics(Renderer *r, unsigned int width, unsigned int height,
 	bottomObject.resize(width*height, vec3(0.f));
 	waterSurface.resize(width*height, vec3(0.f));
 
-	generateRandomWaves();
+	waves = generateRandomWaves();
 }
 
-void WaterPhysics::generateRandomWaves() {
+vector<WaveFunction> generateRandomWaves() {
 	float posRange = 20.f;
 	float heightRange = 0.2f;
 	float wavelengthRange = 20.f;
 	float speedRange = 0.3f;
+
+	vector<WaveFunction> waves;
 
 	//Generate wind directions
 	for (int i = 0; i < MAX_WAVE_NUMBER; i++) {
@@ -48,6 +50,8 @@ void WaterPhysics::generateRandomWaves() {
 		//		0.f));	
 			rand01()*heightRange));
 	}
+
+	return waves;
 }
 
 void WaterPhysics::addForces(glm::vec3 *vertices, size_t numVertices, Drawable *dObject,
@@ -101,8 +105,10 @@ void WaterPhysics::addForces(glm::vec3 *vertices, size_t numVertices, Drawable *
 				0.f, topObject[i].y - bottomObject[i].y);
 
 			//Addforces
-			if(depth >= 0.00001f)
+			if (depth >= 0.00001f)
+			{
 				pObject->addForce(-GRAVITY*depth*xWidth*zWidth*WATER_DENSITY, bottomObject[i]);	
+			}
 		}
 	}
 

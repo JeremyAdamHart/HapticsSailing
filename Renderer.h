@@ -42,11 +42,12 @@ Framebuffer createDepthFramebuffer(unsigned int width, unsigned int height,
 Framebuffer createPositionFramebuffer(unsigned int width, unsigned int height);
 
 class Renderer{
-	GLFWwindow* window;
 public:
+	GLFWwindow* window;
 	Renderer();
 
 	GLFWwindow* createWindow(int width = 800, int height = 800);
+	GLFWwindow* createWindowChild(GLFWwindow *parent, int width = 800, int height = 800);
 
 	void useDefaultFramebuffer();
 
