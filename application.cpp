@@ -282,7 +282,7 @@ int main(int argc, char* argv[])
 	sailSpring = new MSSystem();
 	sailSpring->initializeTriangleMassSystem(
 		sailMesh.vertices[0], sailMesh.vertices[2], sailMesh.vertices[1], 
-		10, 100.f, 2000.f);
+		20, 100.f, 2000.f);
 	ElementGeometry sailGeometry;
 //	sailGeometry.mode = GL_LINES;
 	TorranceSparrow sailMat;
@@ -433,7 +433,7 @@ void updateHaptics(void)
 		// RUN SIMULATION
 		/////////////////////////////////////////////////////////////////////
 
-		double timeElapsed = timer.getCurrentTimeSeconds();
+		double frameTime = timer.getCurrentTimeSeconds();
 		timer.reset();
 
 		rudder->calculateRudderDirection(toolPos, 0.05);
@@ -443,7 +443,7 @@ void updateHaptics(void)
 		sailSpring->transformFixedPoints(physicsShip->matrix());
 
 		sailSpring->applyWindForce(sail->model_matrix, vec3(0.f, 0.f, -12.f));
-		sailSpring->solve(float(timeElapsed));
+		sailSpring->solve(std::min(float(frameTime), 0.002f));
 		sailSpring->calculateNormals();
 
 		sailSpring->applyForcesToRigidBody(physicsShip);
@@ -454,10 +454,10 @@ void updateHaptics(void)
 		physicsShip->addGravityForces();
 		physicsShip->addDampingForces();
 
-		physicsShip->resolveForces(float(timeElapsed));
+		physicsShip->resolveForces(std::min(float(frameTime), 0.002f));
 		buoyShip.model_matrix = physicsShip->matrix();
 
-		timeElapsed += float(timeElapsed);
+		timeElapsed += float(std::min(float(frameTime), 0.002f));
 
 		/////////////////////////////////////////////////////////////////////
 		// COMPUTE FORCES

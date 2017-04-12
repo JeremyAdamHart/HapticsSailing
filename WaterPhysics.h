@@ -36,7 +36,7 @@ public:
 	WaterPhysics(Renderer *r, unsigned int width=20, unsigned int height=20, float *timeElapsed=NULL);
 
 	void addForces(glm::vec3 *vertices, size_t numVertices, Drawable *dObject, 
-		RigidBody *pObject);		//Ugly should have subclassed
+		RigidBody *pObject);		//Ugly, should have subclassed
 
 	void setRenderer(Renderer *newRenderer) { r = newRenderer; }
 };
