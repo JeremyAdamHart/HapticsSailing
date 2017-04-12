@@ -386,3 +386,14 @@ void MSSystem::transformFixedPoints(const mat4 &model_matrix){
 		}
 	}
 }
+
+void MSSystem::setBoomEndPoint(vec3 boomPosition) {
+	masses[0].position = boomPosition;
+}
+
+vec3 MSSystem::getBoomForce() {
+	if (fixedForces.size() == 0)
+		return masses[0].getForce();
+	else
+		return fixedForces[0].force;
+}

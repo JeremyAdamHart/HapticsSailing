@@ -297,7 +297,7 @@ int main(int argc, char* argv[])
 	MeshInfoLoader sailMesh ("models/sail.obj");
 	sailSpring = new MSSystem();
 	sailSpring->initializeTriangleMassSystem(
-		sailMesh.vertices[0], sailMesh.vertices[2], sailMesh.vertices[1], 
+		sailMesh.vertices[2], sailMesh.vertices[1], sailMesh.vertices[0],
 		20, 100.f, 2000.f);
 	ElementGeometry sailGeometry;
 //	sailGeometry.mode = GL_LINES;
@@ -438,7 +438,7 @@ void updateHaptics(void)
 	vec3 prevForceA(0.f);
 	vec3 prevForceB(0.f);
 
-	const float MAX_FORCE_DIFF = 1000.f;
+	const float MAX_FORCE_DIFF = 5.f;
 
 	// main haptic simulation loop
 	while (simulationRunning)
@@ -472,15 +472,17 @@ void updateHaptics(void)
 		double frameTime = timer.getCurrentTimeSeconds();
 		timer.reset();
 
+		sailSpring->transformFixedPoints(physicsShip->matrix());
+
+		vec3 sailForceOnBoom = sailSpring->getBoomForce();
+		boom->addForceToBoom(toVec3(inverse(physicsShip->matrix())*vec4(sailForceOnBoom, 1.f)));
 		vec3 boomForce = boom->updateHandleAndGetForce(bToolPos, 0.05)/50.f;
 		boom->calculateBoomPosition(frameTime/100.f);
-//		sailSpring->
+		sailSpring->setBoomEndPoint(boom->getBoomEndpointWorld());
 
 		rudder->calculateRudderDirection(toolPos, 0.05);
 
 		rudder->applyForce(physicsShip);
-
-		sailSpring->transformFixedPoints(physicsShip->matrix());
 
 		sailSpring->applyWindForce(sail->model_matrix, vec3(0.f, 0.f, -12.f));
 		sailSpring->solve(std::min(float(frameTime), 0.002f));
@@ -511,6 +513,8 @@ void updateHaptics(void)
 		cVector3d force(0, 0, 0);
 		cVector3d torque(0, 0, 0);
 		double gripperForce = 0.0;
+
+		//boomForce = vec3(0.f);
 
 		/////////////////////////////////////////////////////////////////////
 		// APPLY FORCES
