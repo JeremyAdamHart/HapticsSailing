@@ -133,7 +133,22 @@ bool rightMouseDown = false;
 vec3 toolPos = vec3(0.f, 0.f, 0.f);		//Make local
 
 //GLOBALS
+RigidBody *physicsShip;
+RudderPhysics *rudder;
+MSSystem *sailSpring;
+vector<WaveFunction> *waves;
 
+Drawable *sail;
+
+MeshInfoLoader shipMesh;
+MeshInfoLoader shipCollisionMesh;
+
+cFrequencyCounter graphicsRate;
+cFrequencyCounter hapticsRate;
+
+float timeElapsed = 0.f;
+
+GLFWwindow *hapticsWindow = NULL;
 
 
 static float rand01() { return float(rand()) / float(RAND_MAX); }
@@ -174,6 +189,8 @@ int main(int argc, char* argv[])
 
 	if (window == NULL)
 		return -1;
+
+	hapticsWindow = ris.createWindowChild(window, 1, 1);
 
     // get width and height of window
     glfwGetWindowSize(window, &width, &height);
@@ -229,16 +246,6 @@ int main(int argc, char* argv[])
     // WIDGETS
     //--------------------------------------------------------------------------
 
-    //--------------------------------------------------------------------------
-    // START SIMULATION
-    //--------------------------------------------------------------------------
-
-    // create a thread which starts the main haptics rendering loop
-    hapticsThread = new cThread();
-    hapticsThread->start(updateHaptics, CTHREAD_PRIORITY_HAPTICS);
-
-    // setup callback when application exits
-    atexit(close);
 
 	//--------------------------------------------------------------------------
 	// SETUP
@@ -265,50 +272,51 @@ int main(int argc, char* argv[])
 	glDepthFunc(GL_LEQUAL);
 
 	//SHIP INITIALIZATION
-	float mass = 12000;
-	MeshInfoLoader shipCollisionMesh("models/shipCollision.obj");
-	RigidBody physicsShip(mass, calculateInertialTensor(&shipCollisionMesh, mass));
-	physicsShip.p = vec3(0, 0.f, 0);
-
 	TorranceSparrow shipMat;
-	MeshInfoLoader shipMesh("models/ship.obj");
+	shipMesh = MeshInfoLoader("models/ship.obj");
 	ElementGeometry shipContainer(&shipMesh, GL_TRIANGLES);
 	Drawable ship(mat4(), &shipMat, &shipContainer);
 
-	ElementGeometry shipCollisionContainer(&shipCollisionMesh, GL_TRIANGLES);
-	PosObject buoyMat;
-	Drawable buoyShip(physicsShip.matrix(), &buoyMat, &shipCollisionContainer);
-
-	MeshInfoLoader rudderGeometry("models/rudder.obj");
-
-
 	//SAIL
-	MSSystem sailSpring;
 	MeshInfoLoader sailMesh ("models/sail.obj");
-	sailSpring.initializeTriangleMassSystem(
+	sailSpring = new MSSystem();
+	sailSpring->initializeTriangleMassSystem(
 		sailMesh.vertices[0], sailMesh.vertices[2], sailMesh.vertices[1], 
 		10, 100.f, 2000.f);
 	ElementGeometry sailGeometry;
 //	sailGeometry.mode = GL_LINES;
 	TorranceSparrow sailMat;
-	sailSpring.loadToGeometryContainer(&sailGeometry);
-	Drawable sail(physicsShip.matrix(), &sailMat, &sailGeometry);
+	sailSpring->loadToGeometryContainer(&sailGeometry);
+	sail = new Drawable(mat4(), &sailMat, &sailGeometry);
 
-	RudderPhysics rudder("models/rudder.obj", "models/handle.obj", "models/pivotPoint.obj");
+	rudder = new RudderPhysics("models/rudder.obj", "models/handle.obj", "models/pivotPoint.obj");
 
 	//WATER
-	float timeElapsed = 0.f;
-	WaterPhysics waterBouyancy(&ris, 80, 80, &timeElapsed);
+	vector<WaveFunction> randomWaves = generateRandomWaves();
+	waves = &randomWaves;
 
 	//Make water
 	for (int i = 0; i < points.size(); i++){
 		points[i] = toMat3(scaleMatrix(20.f))*points[i];
 	}
 	SimpleGeometry waterGeometry(points.data(), points.size(), GL_PATCHES);
-	ToonWater waterMat(&waterBouyancy.waves, &timeElapsed);
+	ToonWater waterMat(waves, &timeElapsed);
 	Drawable water(mat4(), &waterMat, &waterGeometry);
 
 	checkGLErrors("Pre loop");
+
+	//--------------------------------------------------------------------------
+	// START SIMULATION
+	//--------------------------------------------------------------------------
+
+	// create a thread which starts the main haptics rendering loop
+	hapticsThread = new cThread();
+	hapticsThread->start(updateHaptics, CTHREAD_PRIORITY_HAPTICS);
+
+	// setup callback when application exits
+	atexit(close);
+
+	cSleepMs(1000.0);
 
     //--------------------------------------------------------------------------
     // MAIN GRAPHIC LOOP
@@ -321,52 +329,30 @@ int main(int argc, char* argv[])
 		glClearColor(0.6f, 0.8f, 1.0f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//PUT IN HAPTICS LOOPvvvvvvvvvvvvvvvvvvvv
-		rudder.calculateRudderDirection(toolPos, 0.05);
-
-		rudder.applyForce(&physicsShip);
-
-		sailSpring.transformFixedPoints(physicsShip.matrix());
-
-		sailSpring.applyWindForce(sail.model_matrix, vec3(0.f, 0.f, -12.f));
-		sailSpring.solve(1.f / 60.f);
-		sailSpring.calculateNormals();
-
-		sailSpring.applyForcesToRigidBody(&physicsShip);
-
-		waterBouyancy.addForces(shipMesh.vertices.data(), shipMesh.vertices.size(), 
-			&buoyShip, &physicsShip);
-
-		physicsShip.addGravityForces();
-		physicsShip.addDampingForces();
-
-		physicsShip.resolveForces(1.f / 60.f);
-		 ship.model_matrix = buoyShip.model_matrix = physicsShip.matrix();
-
-		//^^^^^^^^^^^^^^^^
+		printf("Graphics rate = %.2f, Haptics rate = %.2f\n", graphicsRate.getFrequency(), hapticsRate.getFrequency());
 
 		//Update matrices
-		water.model_matrix = translateMatrix(vec3(physicsShip.p.x, 0.f, physicsShip.p.z));
-		ship.model_matrix = physicsShip.matrix();
-		rudder.updateModelMatrix(physicsShip.matrix());
+		water.model_matrix = translateMatrix(vec3(physicsShip->p.x, 0.f, physicsShip->p.z));
+		ship.model_matrix = physicsShip->matrix();
+		rudder->updateModelMatrix(physicsShip->matrix());
 
 		cam.center = toVec3(water.model_matrix*toVec4(vec3(0.f), 1.f));
 
-		sailSpring.loadToGeometryContainer(&sailGeometry);
+		sailSpring->loadToGeometryContainer(&sailGeometry);
+
+		ris.useDefaultFramebuffer();
 	
 		//Draw scene
 		ris.draw(cam, &ship);
 
-		ris.draw(cam, &sail);
+		ris.draw(cam, sail);
 
 		ris.draw(cam, &water);
 		
-		ris.draw(cam, &rudder.rudderDrawable);
-		ris.draw(cam, &rudder.handleDrawable);
+		ris.draw(cam, &rudder->rudderDrawable);
+		ris.draw(cam, &rudder->handleDrawable);
 
-		ris.useDefaultFramebuffer();
-
-		timeElapsed += 1.f / 60.f;
+		graphicsRate.signal(1);
 
 		checkGLErrors("Finish draw");
 
@@ -383,6 +369,125 @@ int main(int argc, char* argv[])
     // exit
     return 0;
 }
+
+//--------------------------------------------------------------------------------
+
+void updateHaptics(void)
+{
+	// simulation in now running
+	simulationRunning = true;
+	simulationFinished = false;
+
+	//CREATE OPENGL CONTEXT
+	Renderer hapticsRenderer;
+
+	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+	GLFWwindow *window = hapticsRenderer.createWindow(800, 800);
+
+	if (window == NULL)
+		printf("Initialization failed\n");
+
+	// set current display context
+	glfwMakeContextCurrent(window);
+
+	glPatchParameteri(GL_PATCH_VERTICES, 4);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+
+	WaterPhysics waterBouyancy(&hapticsRenderer, 20, 20, &timeElapsed);
+	waterBouyancy.waves = *waves;
+
+	float mass = 12000;
+	shipCollisionMesh = MeshInfoLoader("models/shipCollision.obj");
+	physicsShip = new RigidBody(mass, calculateInertialTensor(&shipCollisionMesh, mass));
+	physicsShip->p = vec3(0, 0.f, 0);
+
+	ElementGeometry shipCollisionContainer(&shipCollisionMesh, GL_TRIANGLES);
+	PosObject buoyMat;
+	Drawable buoyShip(physicsShip->matrix(), &buoyMat, &shipCollisionContainer);
+
+	cPrecisionClock timer;
+	timer.start();
+
+	// main haptic simulation loop
+	while (simulationRunning)
+	{
+		/////////////////////////////////////////////////////////////////////
+		// READ HAPTIC DEVICE
+		/////////////////////////////////////////////////////////////////////
+
+		// read position 
+		cVector3d position;
+		hapticDevice->getPosition(position);
+
+		// read orientation 
+		cMatrix3d rotation;
+		hapticDevice->getRotation(rotation);
+
+		// read user-switch status (button 0)
+		bool button = false;
+		hapticDevice->getUserSwitch(0, button);
+
+		//////////////////////////////////////////////////////////////////////
+		// RUN SIMULATION
+		/////////////////////////////////////////////////////////////////////
+
+		double timeElapsed = timer.getCurrentTimeSeconds();
+		timer.reset();
+
+		rudder->calculateRudderDirection(toolPos, 0.05);
+
+		rudder->applyForce(physicsShip);
+
+		sailSpring->transformFixedPoints(physicsShip->matrix());
+
+		sailSpring->applyWindForce(sail->model_matrix, vec3(0.f, 0.f, -12.f));
+		sailSpring->solve(float(timeElapsed));
+		sailSpring->calculateNormals();
+
+		sailSpring->applyForcesToRigidBody(physicsShip);
+
+		waterBouyancy.addForces(shipMesh.vertices.data(), shipMesh.vertices.size(),
+			&buoyShip, physicsShip);
+
+		physicsShip->addGravityForces();
+		physicsShip->addDampingForces();
+
+		physicsShip->resolveForces(float(timeElapsed));
+		buoyShip.model_matrix = physicsShip->matrix();
+
+		timeElapsed += float(timeElapsed);
+
+		/////////////////////////////////////////////////////////////////////
+		// COMPUTE FORCES
+		/////////////////////////////////////////////////////////////////////
+
+		cVector3d force(0, 0, 0);
+		cVector3d torque(0, 0, 0);
+		double gripperForce = 0.0;
+
+		toolPos = vec3(position.y(), position.z(), position.x());
+
+		//		printf("p(%f, %f, %f)\n", position.y(), position.z(), position.x());
+
+
+		/////////////////////////////////////////////////////////////////////
+		// APPLY FORCES
+		/////////////////////////////////////////////////////////////////////
+
+		// send computed force, torque, and gripper force to haptic device
+		hapticDevice->setForceAndTorqueAndGripperForce(force, torque, gripperForce);
+
+		// signal frequency counter
+		hapticsRate.signal(1);
+	}
+
+	// exit haptics thread
+	simulationFinished = true;
+}
+
+
 
 //------------------------------------------------------------------------------
 
@@ -506,62 +611,15 @@ void close(void)
     // close haptic device
     hapticDevice->close();
 
+	delete sail;
+	delete rudder;
+	delete sailSpring;
+	delete physicsShip;
+
     // delete resources
     delete hapticsThread;
     delete handler;
 }
 
-void updateHaptics(void)
-{
-    // simulation in now running
-    simulationRunning  = true;
-    simulationFinished = false;
-
-    // main haptic simulation loop
-    while(simulationRunning)
-    {
-        /////////////////////////////////////////////////////////////////////
-        // READ HAPTIC DEVICE
-        /////////////////////////////////////////////////////////////////////
-
-        // read position 
-        cVector3d position;
-        hapticDevice->getPosition(position);
-
-        // read orientation 
-        cMatrix3d rotation;
-        hapticDevice->getRotation(rotation);
-
-        // read user-switch status (button 0)
-        bool button = false;
-        hapticDevice->getUserSwitch(0, button);
-
-        /////////////////////////////////////////////////////////////////////
-        // COMPUTE FORCES
-        /////////////////////////////////////////////////////////////////////
-
-        cVector3d force(0, 0, 0);
-        cVector3d torque(0, 0, 0);
-        double gripperForce = 0.0;
-
-		toolPos = vec3(position.y(), position.z(), position.x());
-
-//		printf("p(%f, %f, %f)\n", position.y(), position.z(), position.x());
-
-
-        /////////////////////////////////////////////////////////////////////
-        // APPLY FORCES
-        /////////////////////////////////////////////////////////////////////
-
-        // send computed force, torque, and gripper force to haptic device
-        hapticDevice->setForceAndTorqueAndGripperForce(force, torque, gripperForce);
-
-        // signal frequency counter
-        freqCounterHaptics.signal(1);
-    }
-    
-    // exit haptics thread
-    simulationFinished = true;
-}
 
 //------------------------------------------------------------------------------
