@@ -22,6 +22,8 @@ class WaterPhysics{
 	PosWater waterMat;
 	Drawable water;
 
+	int counter;
+
 	Renderer *r;
 
 	vector<vec3> waterPoints;

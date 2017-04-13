@@ -159,7 +159,11 @@ void RigidBody::addGravityForces() {
 }
 
 void RigidBody::addDampingForces() {
-	force += -v*DAMPING_LINEAR*mass*0.05f;
+	vec3 forward = toVec3(matrix()*vec4(0, 0, 1, 0));
+	vec3 v_parallel = dot(v, forward)*forward;
+	vec3 v_perpendicular = v - v_parallel;
+
+	force += -v_perpendicular*DAMPING_LINEAR*mass*0.05f - v*v_parallel*DAMPING_LINEAR_FORWARDS*mass;
 	torque += -omega*DAMPING_ANGULAR*mass*mass*0.0001f;
 }
 

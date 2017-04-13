@@ -4,6 +4,8 @@
 #include <vector>
 #include <iterator>
 #include <glm/glm.hpp>
+#include <mutex>
+
 #include "ElementGeometry.h"
 #include "Physics.h"
 #include "BoomPhysics.h"
@@ -50,6 +52,7 @@ class Spring {
 	float restLength;
 	float damping;
 
+
 public:
 	Mass *a, *b;
 	Spring():a(NULL), b(NULL), stiffness(0.0), restLength(0.0), damping(0.0) {}
@@ -83,6 +86,8 @@ class MSSystem {
 
 public:
 	enum{POINT_MASS, GRID};
+
+	std::mutex geometryDataMtx;
 
 	MSSystem() {}
 
