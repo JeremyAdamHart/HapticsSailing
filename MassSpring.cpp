@@ -1,6 +1,8 @@
 #include "MassSpring.h"
 #include "glmSupport.h"
 
+#include <algorithm>
+
 const float AIR_DAMPING = 1.0f;
 
 void Mass::resolveForce(float dt) {
@@ -69,7 +71,7 @@ vector<unsigned int> MSSystem::initializeTriangleMassSystem(vec3 p1, vec3 p2, ve
 	for (float u = 0.f; u < 1.000001f; u+=step){
 		for (float v = 0.f; u + v < 1.000001f; v+= step){
 			masses.push_back(Mass(iMass, p1 + e1*u + e2*v));
-			if (false)	{//(u == 0.f) || (v == 0.f)) {
+			if (false){	//v + u > 0.999999f)	{//(u == 0.f) || (v == 0.f)) {
 				masses.back().setFixed(true);
 				originalFixedPositions.push_back(masses.back().getPosition());
 			}
@@ -90,7 +92,7 @@ vector<unsigned int> MSSystem::initializeTriangleMassSystem(vec3 p1, vec3 p2, ve
 
 	faces.clear();
 
-	float stretchFactor = 1.0f;
+	float stretchFactor = 0.9f;
 
 	for (int i = 0; i < masses.size(); i++){
 		//First triangle
@@ -132,6 +134,9 @@ vector<unsigned int> MSSystem::initializeTriangleMassSystem(vec3 p1, vec3 p2, ve
 			}
 		}
 	}
+
+	normals.resize(masses.size(), vec3(0.f));
+	areas.resize(masses.size(), 0.f);
 
 	calculateNormals();
 
@@ -304,10 +309,13 @@ void MSSystem::initializeGridMassSystem(int yNum, int xNum, float width,
 }
 
 void MSSystem::calculateNormals(){
-	normals.clear();
+/*	normals.clear();
 	normals.resize(masses.size(), vec3(0.f));
 	areas.clear();
-	areas.resize(masses.size(), 0.f);
+	areas.resize(masses.size(), 0.f);*/
+
+	fill(normals.begin(), normals.end(), vec3(0.f));
+	fill(areas.begin(), areas.end(), 0.f);
 
 	for (int i = 0; i+2 < faces.size(); i+=3){
 		vec3 p1 = masses[faces[i]].getPosition();
@@ -332,6 +340,7 @@ void MSSystem::calculateNormals(){
 }
 
 void MSSystem::loadToGeometryContainer(ElementGeometry *geom){
+
 	vector<vec3> geomPositions;
 	vector<vec2> geomUvs;
 	geomUvs.resize(masses.size());
@@ -341,13 +350,15 @@ void MSSystem::loadToGeometryContainer(ElementGeometry *geom){
 		geomPositions.push_back(masses[i].getPosition());
 	}
 
-	for (int i = 0; i < springs.size(); i++){
+/*	for (int i = 0; i < springs.size(); i++){
         		indices.push_back(springs[i].a - masses.data());
 		indices.push_back(springs[i].b - masses.data());
 	}
-
+*/
+//	geometryDataMtx.lock();
 	geom->loadGeometry(geomPositions.data(), normals.data(), geomUvs.data(), faces.data(),
 		geomPositions.size(), faces.size(), GL_DYNAMIC_DRAW);
+//	geometryDataMtx.unlock();
 
 //	geom->loadGeometry(geomPositions.data(), normals.data(), geomUvs.data(), indices.data(),
 //		geomPositions.size(), indices.size(), GL_DYNAMIC_DRAW);
@@ -357,6 +368,7 @@ void MSSystem::applyWindForce(const mat4 &model_matrix, vec3 velocity){
 	vec3 velocity_modelSpace = inverse(toMat3(model_matrix))*velocity;
 
 	float alpha = 20.f;
+	alpha = 60.f;
 	alpha = 60.f;
 
 	for (int i = 0; i < masses.size(); i++){

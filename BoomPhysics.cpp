@@ -5,8 +5,8 @@ const float MAX_HALF_ANGLE = M_PI / 4.f;
 const float EXTRA_ROPE_AT_MAX = 0.5f;
 const float BOOM_SCALE = 0.5f;		//Relationship between boom length and rope position
 const float MASS = 1000.f;
-const float BOOM_DAMPING = 20.f;
-const float ROPE_STIFFNESS = 5000.f;
+const float BOOM_DAMPING = 1.f;
+const float ROPE_STIFFNESS = 2000.f;
 
 
 Boom::Boom(char *boomObj, char *ropeObj, char *pivotObj, char *ropePointObj)
@@ -86,7 +86,7 @@ vec3 Boom::updateHandleAndGetForce(vec3 handle, float dimension)
 	vec3 force = normalize(ropePoint - boomPosition)*(totalLength - ropeLength)*ROPE_STIFFNESS;
 	addForceToBoom(force);
 
-	return vec3(length(force)*normalize(ropePoint - handlePoint));
+	return length(force)*normalize(ropePoint - handlePoint)*dimension/handleRange;
 }
 
 void Boom::addForceToBoom(vec3 force) {
@@ -99,6 +99,19 @@ void Boom::calculateBoomPosition(float dt) {
 	boomVelocity += acceleration*dt;
 	boomPosition = toMat3(glm::rotate(boomVelocity / (boomLength*BOOM_SCALE), vec3(0, 1, 0)))*
 		(boomPosition - pivotPoint) + pivotPoint;
+
+	//Bounds check
+	vec3 axis = cross(normalize(boomPosition - pivotPoint), vec3(0, 0, 1));
+	float angle = asin(length(axis));
+
+	if (angle > MAX_HALF_ANGLE) {
+		if(dot(axis, vec3(0, 1, 0)) < 0.f)
+			boomPosition = pivotPoint + BOOM_SCALE*boomLength*vec3(sin(MAX_HALF_ANGLE), 0.f, cos(MAX_HALF_ANGLE));
+		else
+			boomPosition = pivotPoint + BOOM_SCALE*boomLength*vec3(-sin(MAX_HALF_ANGLE), 0.f, cos(MAX_HALF_ANGLE));
+
+		boomVelocity = 0.f;
+	}
 
 	boomForce = 0.f;
 }

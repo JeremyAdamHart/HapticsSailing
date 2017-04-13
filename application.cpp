@@ -122,9 +122,6 @@ void keyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void mousePositionCallback(GLFWwindow *window, double xpos, double ypos);
 
-// this function renders the scene
-void updateGraphics(void);
-
 // this function contains the main haptics simulation loop
 void updateHaptics(void);
 
@@ -134,6 +131,8 @@ void close(void);
 TrackballCamera* activeCamera = NULL;
 bool leftMouseDown = false;
 bool rightMouseDown = false;
+
+float fov = 100.0;		//Degrees
 
 //GLOBALS
 RigidBody *physicsShip;
@@ -267,7 +266,6 @@ int main(int argc, char* argv[])
 	// SETUP
 	//--------------------------------------------------------------------------
 
-	float fov = 100.0;		//Degrees
 	mat4 projectionMatrix = perspectiveFov(fov, (float)width, (float)height, 0.01f, 1000.f);
 	TrackballCamera cam(
 		vec3(0, 0, -1),		//Direction
@@ -294,17 +292,18 @@ int main(int argc, char* argv[])
 	Drawable ship(mat4(), &shipMat, &shipContainer);
 
 	//SAIL
+	boom = new Boom("models/boom.obj", "models/rope.obj", "models/boomPivot.obj", "models/ropePoint.obj");
+	boom->updateModelMatrix(mat4());
 	MeshInfoLoader sailMesh ("models/sail.obj");
 	sailSpring = new MSSystem();
 	sailSpring->initializeTriangleMassSystem(
-		sailMesh.vertices[2], sailMesh.vertices[1], sailMesh.vertices[0],
-		20, 100.f, 2000.f);
+		boom->getBoomEndpointWorld(), sailMesh.vertices[1], sailMesh.vertices[0],
+		20, 10.f, 2000.f);
 	ElementGeometry sailGeometry;
 //	sailGeometry.mode = GL_LINES;
 	TorranceSparrow sailMat;
 	sailSpring->loadToGeometryContainer(&sailGeometry);
 	sail = new Drawable(mat4(), &sailMat, &sailGeometry);
-	boom = new Boom("models/boom.obj", "models/rope.obj", "models/boomPivot.obj", "models/ropePoint.obj");
 	rudder = new RudderPhysics("models/rudder.obj", "models/handle.obj", "models/pivotPoint.obj");
 
 	//WATER
@@ -386,6 +385,8 @@ int main(int argc, char* argv[])
 
     // terminate GLFW library
     glfwTerminate();
+
+	simulationRunning = false;
 
     // exit
     return 0;
@@ -508,21 +509,29 @@ void updateHaptics(void)
 		/////////////////////////////////////////////////////////////////////
 
 		double frameTime = timer.getCurrentTimeSeconds();
+//		frameTime = 0.0;
 		timer.reset();
 
 		sailSpring->transformFixedPoints(physicsShip->matrix());
 
+		vec3 boomForce = boom->updateHandleAndGetForce(bToolPos, 0.05);
 		vec3 sailForceOnBoom = sailSpring->getBoomForce();
 		boom->addForceToBoom(toVec3(inverse(physicsShip->matrix())*vec4(sailForceOnBoom, 1.f)));
-		vec3 boomForce = boom->updateHandleAndGetForce(bToolPos, 0.05)/50.f;
 		boom->calculateBoomPosition(frameTime);
 		sailSpring->setBoomEndPoint(boom->getBoomEndpointWorld());
+
+		//Apply boom force
+		float boomForceDiff = length(boomForce - prevForceB);
+		if (boomForceDiff > MAX_FORCE_DIFF)
+			boomForce = prevForceB + normalize(boomForce - prevForceB)*MAX_FORCE_DIFF;
+		bHapticDevice->setForce(toCVector3d(boomForce));
+
 
 		rudder->calculateRudderDirection(toolPos, 0.05);
 
 		rudder->applyForce(physicsShip);
 
-		sailSpring->applyWindForce(sail->model_matrix, vec3(0.f, 0.f, -12.f));
+		sailSpring->applyWindForce(sail->model_matrix, vec3(0.f, 0.f, -20.f));
 		sailSpring->solve(std::min(float(frameTime), 0.002f));
 		sailSpring->calculateNormals();
 
@@ -543,24 +552,18 @@ void updateHaptics(void)
 		// COMPUTE FORCES
 		/////////////////////////////////////////////////////////////////////
 
-		float boomForceDiff = length(boomForce - prevForceB);
-		if (boomForceDiff > MAX_FORCE_DIFF)
-			boomForce = prevForceB + normalize(boomForce - prevForceB)*MAX_FORCE_DIFF;
-//		printf("Force (%f, %f, %f)\n", boomForce.x, boomForce.y, boomForce.z);
-
 		cVector3d force(0, 0, 0);
 		cVector3d torque(0, 0, 0);
 		double gripperForce = 0.0;
 
-		//boomForce = vec3(0.f);
+//		boomForce = vec3(0.f);
 
 		/////////////////////////////////////////////////////////////////////
 		// APPLY FORCES
 		/////////////////////////////////////////////////////////////////////
 
 		// send computed force, torque, and gripper force to haptic device
-		hapticDevice->setForceAndTorqueAndGripperForce(force, torque, gripperForce);
-		bHapticDevice->setForceAndTorqueAndGripperForce(toCVector3d(boomForce), torque, gripperForce);
+		hapticDevice->setForce(force);
 
 		// signal frequency counter
 		hapticsRate.signal(1);
@@ -568,6 +571,9 @@ void updateHaptics(void)
 
 	// exit haptics thread
 	simulationFinished = true;
+
+	glfwDestroyWindow(window);
+
 }
 
 
@@ -579,6 +585,9 @@ void windowSizeCallback(GLFWwindow* a_window, int a_width, int a_height)
     // update window size
     width  = a_width;
     height = a_height;
+
+
+	activeCamera->projection = perspectiveFov(fov, (float)width, (float)height, 0.01f, 1000.f);
 }
 
 //------------------------------------------------------------------------------
@@ -698,6 +707,7 @@ void close(void)
 	delete rudder;
 	delete sailSpring;
 	delete physicsShip;
+	delete boom;
 
     // delete resources
     delete hapticsThread;
