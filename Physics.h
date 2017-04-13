@@ -7,7 +7,7 @@
 
 const float DAMPING_LINEAR = 0.5f;
 const float DAMPING_LINEAR_FORWARDS = 0.f;
-const float DAMPING_ANGULAR = 5.f;
+const float DAMPING_ANGULAR = 10.f;
 const glm::vec3 GRAVITY(0, -9.81, 0);
 
 class RigidBody{
@@ -30,6 +30,7 @@ public:
 	RigidBody(float mass, glm::mat3 inertialTensor);
 
 	void addForce(glm::vec3 f, glm::vec3 loc);
+	void addTorqueOnly(glm::vec3 f, glm::vec3 loc);
 	void resolveForces(float dt);
 
 	void addGravityForces();

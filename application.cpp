@@ -477,7 +477,7 @@ void updateHaptics(void)
 	vec3 prevForceA(0.f);
 	vec3 prevForceB(0.f);
 
-	const float MAX_FORCE_DIFF = 5.f;
+	const float MAX_FORCE_DIFF = 0.5f;
 
 	// main haptic simulation loop
 	while (simulationRunning)
@@ -515,7 +515,7 @@ void updateHaptics(void)
 		sailSpring->transformFixedPoints(physicsShip->matrix());
 
 		vec3 boomForce = boom->updateHandleAndGetForce(bToolPos, 0.05);
-		vec3 sailForceOnBoom = sailSpring->getBoomForce();
+		vec3 sailForceOnBoom = sailSpring->getBoomForce()/10.f;
 		boom->addForceToBoom(toVec3(inverse(physicsShip->matrix())*vec4(sailForceOnBoom, 1.f)));
 		boom->calculateBoomPosition(frameTime);
 		sailSpring->setBoomEndPoint(boom->getBoomEndpointWorld());
@@ -524,14 +524,15 @@ void updateHaptics(void)
 		float boomForceDiff = length(boomForce - prevForceB);
 		if (boomForceDiff > MAX_FORCE_DIFF)
 			boomForce = prevForceB + normalize(boomForce - prevForceB)*MAX_FORCE_DIFF;
+		prevForceB = boomForce;
 		bHapticDevice->setForce(toCVector3d(boomForce));
 
 
 		rudder->calculateRudderDirection(toolPos, 0.05);
 
-		rudder->applyForce(physicsShip);
+		vec3 rudderForce = rudder->applyForce(physicsShip)/50000.f;
 
-		sailSpring->applyWindForce(sail->model_matrix, vec3(0.f, 0.f, -20.f));
+		sailSpring->applyWindForce(sail->model_matrix, vec3(0.f, 0.f, -12.f));
 		sailSpring->solve(std::min(float(frameTime), 0.002f));
 		sailSpring->calculateNormals();
 
@@ -562,8 +563,13 @@ void updateHaptics(void)
 		// APPLY FORCES
 		/////////////////////////////////////////////////////////////////////
 
+		float rudderForceDiff = length(rudderForce- prevForceA);
+		if (rudderForceDiff> MAX_FORCE_DIFF)
+			rudderForce = prevForceA + normalize(rudderForce- prevForceA)*MAX_FORCE_DIFF;
+		prevForceA = rudderForce;
+
 		// send computed force, torque, and gripper force to haptic device
-		hapticDevice->setForce(force);
+		hapticDevice->setForce(toCVector3d(rudderForce));
 
 		// signal frequency counter
 		hapticsRate.signal(1);

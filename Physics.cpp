@@ -5,6 +5,8 @@
 #include <ctime>
 #include <glm/gtc/type_ptr.hpp>
 
+const float MINIMUM_FORWARD_VELOCITY = 2.f;
+
 using namespace glm;
 
 RigidBody::RigidBody(float mass, mat3 inertialTensor) :force(0.f), torque(0.f), p(0.f), v(0.f), 
@@ -27,7 +29,21 @@ void RigidBody::addForce(vec3 f, vec3 loc){
 	torque += cross(r, f);
 }
 
+void RigidBody::addTorqueOnly(vec3 f, vec3 loc) {
+	vec3 r = loc - p;
+	torque += cross(r, f);
+}
+
 void RigidBody::resolveForces(float dt){
+
+	vec3 forward = toVec3(normalize(matrix()*vec4(0, 0, -1, 0)));
+	vec3 v_parallel = dot(v, forward)*forward;
+	vec3 v_perpendicular = v - v_parallel;
+
+	if(length(v_parallel) < MINIMUM_FORWARD_VELOCITY) 
+		v_parallel = forward*MINIMUM_FORWARD_VELOCITY;
+
+	v = v_parallel + v_perpendicular;
 
 	//Linear integration
 	v += force/mass*dt;
@@ -164,7 +180,7 @@ void RigidBody::addDampingForces() {
 	vec3 v_perpendicular = v - v_parallel;
 
 	force += -v_perpendicular*DAMPING_LINEAR*mass*0.05f - v*v_parallel*DAMPING_LINEAR_FORWARDS*mass;
-	torque += -omega*DAMPING_ANGULAR*mass*mass*0.0001f;
+	torque += -omega*DAMPING_ANGULAR*mass;
 }
 
 //-0.22352  1.26375

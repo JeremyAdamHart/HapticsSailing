@@ -6,7 +6,7 @@ const float EXTRA_ROPE_AT_MAX = 0.5f;
 const float BOOM_SCALE = 0.5f;		//Relationship between boom length and rope position
 const float MASS = 1000.f;
 const float BOOM_DAMPING = 1.f;
-const float ROPE_STIFFNESS = 2000.f;
+const float ROPE_STIFFNESS = 4000.f;
 
 
 Boom::Boom(char *boomObj, char *ropeObj, char *pivotObj, char *ropePointObj)
@@ -77,7 +77,7 @@ vec3 Boom::updateHandleAndGetForce(vec3 handle, float dimension)
 {
 	vec3 relative_pos = (0.5f*handle / dimension + vec3(0.f, 0.5f, 0.5f))*handleRange;
 
-	handlePoint = ropePoint + vec3(0, 0, 1)*EXTRA_ROPE_AT_MAX*0.f + relative_pos;
+	handlePoint = ropePoint + vec3(0, 0, 1)*EXTRA_ROPE_AT_MAX + relative_pos;
 
 	float totalLength = length(boomPosition - ropePoint) + length(ropePoint - handlePoint);
 	if (totalLength <= ropeLength)

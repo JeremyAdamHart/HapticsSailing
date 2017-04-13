@@ -21,7 +21,7 @@ void RudderPhysics::calculateRudderDirection(vec3 handle, float dimension)
 
 }
 
-void RudderPhysics::applyForce(RigidBody *object)
+vec3 RudderPhysics::applyForce(RigidBody *object)
 {
 	//Find actual velocity of rudder?
 
@@ -30,9 +30,11 @@ void RudderPhysics::applyForce(RigidBody *object)
 	vec3 position_worldspace = toVec3(object->matrix()*vec4(pivotPoint, 1.f));
 
 	vec3 force = dot(object->v, normalize(normal_worldspace))
-		*normal_worldspace*50000.f;
+		*normal_worldspace*10000.f;
 
-	object->addForce(-force, position_worldspace);
+	object->addTorqueOnly(-force, position_worldspace);
+
+	return normal_modelspace*dot(object->v, normalize(normal_worldspace))*10000.f;
 }
 
 void RudderPhysics::updateModelMatrix(const mat4 &model_matrix){

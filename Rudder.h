@@ -29,5 +29,5 @@ public:
 	void calculateRudderDirection(glm::vec3 handle, float dimension);
 	void updateModelMatrix(const glm::mat4 &model_matrix);	//Boat's model matrix
 
-	void applyForce(RigidBody *object);
+	vec3 applyForce(RigidBody *object);
 };

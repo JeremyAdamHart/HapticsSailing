@@ -123,14 +123,17 @@ vector<unsigned int> MSSystem::initializeTriangleMassSystem(vec3 p1, vec3 p2, ve
 			break;
 	}
 
-	float maxTexDist = 2.f*step + 0.00001;
+	float maxTexDist = sqrt(2.f)*2.f*step + 0.00001;
 	
 	for (int i = 0; i < masses.size(); i++){
 		for (int j = i + 1; j < masses.size(); j++){
 			float texDist = length(texCoords[i] - texCoords[j]);
 			if (texDist < maxTexDist){
 				float actDist = length(masses[i].getPosition() - masses[j].getPosition());
-				springs.push_back(Spring(&masses[i], &masses[j], stiffness, actDist*stretchFactor));
+			//	if(texDist < 2.f*step + 0.000001)
+					springs.push_back(Spring(&masses[i], &masses[j], stiffness*step/texDist, actDist*stretchFactor));
+			//	else
+				//	springs.push_back(Spring(&masses[i], &masses[j], stiffness*0.5f, actDist));
 			}
 		}
 	}
@@ -369,7 +372,7 @@ void MSSystem::applyWindForce(const mat4 &model_matrix, vec3 velocity){
 
 	float alpha = 20.f;
 	alpha = 60.f;
-	alpha = 60.f;
+	alpha = 20.f;
 
 	for (int i = 0; i < masses.size(); i++){
 		vec3 relativeVelocity = velocity - masses[i].getVelocity();
@@ -380,10 +383,14 @@ void MSSystem::applyWindForce(const mat4 &model_matrix, vec3 velocity){
 }
 
 void MSSystem::applyForcesToRigidBody(RigidBody *object){
+	vec3 forward = toVec3(normalize(object->matrix()*vec4(0, 0, -1, 0)));
+
 	for (int i = 0; i < fixedForces.size(); i++){
 		vec3 pos_m = masses[fixedForces[i].massIndex].getPosition();
 		vec3 force = fixedForces[i].force;
-		vec4 position = object->matrix()*vec4(pos_m.x, pos_m.y, pos_m.z, 1.f);
+
+		//Increase force in forward direction
+		force += 4.f*dot(force, forward)*forward;
 
 		object->addForce(force, pos_m);
 	}
