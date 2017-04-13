@@ -86,7 +86,7 @@
       <Filter>Source Files\Physics</Filter>
     </ClCompile>
     <ClCompile Include="BoomPhysics.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -157,7 +157,7 @@
       <Filter>Source Files\Physics</Filter>
     </ClInclude>
     <ClInclude Include="BoomPhysics.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

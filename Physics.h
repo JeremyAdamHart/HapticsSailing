@@ -17,7 +17,7 @@ public:
 
 	glm::vec3 p;
 	glm::vec3 v;
-	float mass;
+	float mass; 
 
 	glm::quat q;
 	glm::vec3 omega;

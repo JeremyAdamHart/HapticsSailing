@@ -31,7 +31,7 @@ WaterPhysics::WaterPhysics(Renderer *r, unsigned int width, unsigned int height,
 	bottomObject.resize(width*height, vec3(0.f));
 	waterSurface.resize(width*height, vec3(0.f));
 
-	waves = generateRandomWaves();
+	waves = randomWaveSet(MAX_WAVE_NUMBER);
 }
 
 vector<WaveFunction> generateRandomWaves() {

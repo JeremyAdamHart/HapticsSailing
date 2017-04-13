@@ -17,7 +17,9 @@ float alpha = 5.0;
 float ka = 0.6;
 const vec3 COLOR = vec3(0.1, 0.7, 1.0);
 
-const float WIDTH = 0.5;
+const float WIDTH = 0.4;
+
+const float THRESHOLD = 0.000;
 
 
 float torranceSparrowLighting(vec3 normal, vec3 position, vec3 viewPosition)
@@ -37,9 +39,10 @@ void main(void)
  	vec3 color = torranceSparrowLighting(TessNormal, ModelPosition, camera_position)*COLOR;
 
  	//Draw grid lines
- 	if(((ModelPosition.x/WIDTH) - floor(ModelPosition.x/WIDTH) < WIDTH/4.f) ||
- 		((ModelPosition.z/WIDTH) - floor(ModelPosition.z/WIDTH) < WIDTH/4.f))
+ 	if(((ModelPosition.x/WIDTH) - floor(ModelPosition.x/WIDTH) < WIDTH/8.f) ||
+ 		((ModelPosition.z/WIDTH) - floor(ModelPosition.z/WIDTH) < WIDTH/8.f))
  		color = vec3(0.1, 0.1, 0.1);
-// 	color = normalize(ModelPosition - camera_position);
+ 	//if(dot(normalize(TessNormal), normalize(camera_position - ModelPosition)) < THRESHOLD)
+ 	//	color = vec3(0.1, 0.1, 0.1);
  	FragmentColour = vec4(color, 1);
 }

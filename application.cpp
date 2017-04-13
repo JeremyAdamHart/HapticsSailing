@@ -279,11 +279,34 @@ int main(int argc, char* argv[])
 
 	activeCamera = &cam;
 
+	float out = 10.f;
+
 	vector<vec3> points;
 	points.push_back(vec3(-1, 0, 1));
 	points.push_back(vec3(1, 0, 1));
 	points.push_back(vec3(-1, 0, -1));
 	points.push_back(vec3(1, 0, -1));
+
+	points.push_back(vec3(-1, 0, -1));
+	points.push_back(vec3(1, 0, -1));
+	points.push_back(vec3(-out, 0, -out));
+	points.push_back(vec3(out, 0, -out));
+
+	points.push_back(vec3(1, 0, 1));
+	points.push_back(vec3(out, 0, out));
+	points.push_back(vec3(1, 0, -1));
+	points.push_back(vec3(out, 0, -out));
+
+	points.push_back(vec3(-out, 0, out));
+	points.push_back(vec3(out, 0, out));
+	points.push_back(vec3(-1, 0, 1));
+	points.push_back(vec3(1, 0, 1));
+
+	points.push_back(vec3(-out, 0, out));
+	points.push_back(vec3(-1, 0, 1));
+	points.push_back(vec3(-out, 0, -out));
+	points.push_back(vec3(-1, 0, -1));
+
 
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
@@ -318,12 +341,12 @@ int main(int argc, char* argv[])
 	rudder = new RudderPhysics("models/rudder.obj", "models/handle.obj", "models/pivotPoint.obj", "textures/Rudder.png", "textures/handle.png", 5, 6);
 
 	//WATER
-	vector<WaveFunction> randomWaves = generateRandomWaves();
+	vector<WaveFunction> randomWaves = generateRandomWaves();	// randomWaveSet(MAX_WAVE_NUMBER);
 	waves = &randomWaves;
 
 	//Make water
 	for (int i = 0; i < points.size(); i++){
-		points[i] = toMat3(scaleMatrix(20.f))*points[i];
+		points[i] = toMat3(scaleMatrix(10.f))*points[i];
 	}
 	SimpleGeometry waterGeometry(points.data(), points.size(), GL_PATCHES);
 	ToonWater waterMat(waves, &timeElapsed);

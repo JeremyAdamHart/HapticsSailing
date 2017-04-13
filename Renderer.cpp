@@ -4,6 +4,7 @@
 
 #include "glSupport.h"
 //#include <soil/SOIL.h>
+#define STB_IMAGE_IMPLEMENTATION  
 #include <stb/stb_image.h>
 
 using namespace std;
@@ -53,6 +54,8 @@ GLuint createTexture(char* filename)
 	int components;
 	GLuint texID;
 	int tWidth, tHeight;
+
+	stbi_set_flip_vertically_on_load(true);
 
 	glActiveTexture(GL_TEXTURE0);
 
