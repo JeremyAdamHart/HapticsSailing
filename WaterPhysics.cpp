@@ -71,13 +71,7 @@ void WaterPhysics::addForces(glm::vec3 *vertices, size_t numVertices, Drawable *
 	glBindTexture(GL_TEXTURE_2D, fb.texID);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, topObject.data());
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//Draw water surface
-	r->draw(cam, &water);
-	glBindTexture(GL_TEXTURE_2D, fb.texID);
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, waterSurface.data());
-
+	//Draw object bottom
 	glClearDepth(0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -87,8 +81,15 @@ void WaterPhysics::addForces(glm::vec3 *vertices, size_t numVertices, Drawable *
 	glBindTexture(GL_TEXTURE_2D, fb.texID);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, bottomObject.data());
 
-	//Return state
 	glClearDepth(1.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//Draw water surface
+	r->draw(cam, &water);
+	glBindTexture(GL_TEXTURE_2D, fb.texID);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, waterSurface.data());
+	
+	//Return state
 	glDepthFunc(GL_LEQUAL);
 	r->useDefaultFramebuffer();
 

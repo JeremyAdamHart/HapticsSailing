@@ -9,7 +9,7 @@ void main()
 {
 	if(gl_InvocationID == 0)
 	{
-		float tessLevel = 64.0;
+		float tessLevel = 1.0;
 		gl_TessLevelOuter[0] = tessLevel;
 		gl_TessLevelOuter[1] = tessLevel;		//Change this
 		gl_TessLevelOuter[2] = tessLevel;

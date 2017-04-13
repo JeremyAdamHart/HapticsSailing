@@ -397,6 +397,41 @@ vec3 toVec3(cVector3d v) { return vec3(v.y(), v.z(), v.x()); }
 
 //--------------------------------------------------------------------------------
 
+vector<vec3> generateBoundingBox(const vector<vec3> &vertices) {
+
+	vec3 vMin (1000000.f, 1000000.f, 1000000.f);
+	vec3 vMax (-1000000.f, -1000000.f, -1000000.f);
+
+
+	for (int i = 0; i < vertices.size(); i++) {
+		vec3 v = vertices[i];
+		vMin.x = (v.x < vMin.x) ? v.x : vMin.x;
+		vMax.x = (v.x > vMax.x) ? v.x : vMax.x;
+		vMin.y = (v.y < vMin.y) ? v.y : vMin.y;
+		vMax.y = (v.y > vMax.y) ? v.y : vMax.y;
+		vMin.z = (v.z < vMin.z) ? v.z : vMin.z;
+		vMax.z = (v.z > vMax.z) ? v.z : vMax.z;
+	}
+
+	vector<vec3> bounding;
+	
+	for (int i = 0; i < 2; i++) {
+		for (int j = 0; j < 2; j++) {
+			for (int k = 0; k < 2; k++) {
+				float x = (i == 0) ? vMin.x : vMax.x;
+				float y = (j == 0) ? vMin.y : vMax.y;
+				float z = (k == 0) ? vMin.z : vMax.z;
+
+				bounding.push_back(vec3(x, y, z));
+			}
+
+		}
+	}
+
+	return bounding;
+}
+
+
 void updateHaptics(void)
 {
 	// simulation in now running
@@ -423,10 +458,13 @@ void updateHaptics(void)
 	WaterPhysics waterBouyancy(&hapticsRenderer, 20, 20, &timeElapsed);
 	waterBouyancy.waves = *waves;
 
+
 	float mass = 12000;
 	shipCollisionMesh = MeshInfoLoader("models/shipCollision.obj");
 	physicsShip = new RigidBody(mass, calculateInertialTensor(&shipCollisionMesh, mass));
 	physicsShip->p = vec3(0, 0.f, 0);
+
+	vector<vec3> boundingShip = generateBoundingBox(shipCollisionMesh.vertices);
 
 	ElementGeometry shipCollisionContainer(&shipCollisionMesh, GL_TRIANGLES);
 	PosObject buoyMat;
@@ -477,7 +515,7 @@ void updateHaptics(void)
 		vec3 sailForceOnBoom = sailSpring->getBoomForce();
 		boom->addForceToBoom(toVec3(inverse(physicsShip->matrix())*vec4(sailForceOnBoom, 1.f)));
 		vec3 boomForce = boom->updateHandleAndGetForce(bToolPos, 0.05)/50.f;
-		boom->calculateBoomPosition(frameTime/100.f);
+		boom->calculateBoomPosition(frameTime);
 		sailSpring->setBoomEndPoint(boom->getBoomEndpointWorld());
 
 		rudder->calculateRudderDirection(toolPos, 0.05);
@@ -490,7 +528,7 @@ void updateHaptics(void)
 
 		sailSpring->applyForcesToRigidBody(physicsShip);
 
-		waterBouyancy.addForces(shipMesh.vertices.data(), shipMesh.vertices.size(),
+		waterBouyancy.addForces(boundingShip.data(), boundingShip.size(),
 			&buoyShip, physicsShip);
 
 		physicsShip->addGravityForces();
