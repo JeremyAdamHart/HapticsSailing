@@ -1,13 +1,22 @@
 #include "Rudder.h"
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
+#include "Renderer.h"
 
-RudderPhysics::RudderPhysics(char *rudderObj, char *handleObj, char *pivotObj) :
+RudderPhysics::RudderPhysics(char *rudderObj, char *handleObj, char *pivotObj, char *rudderImage, char *handleImage, int rudderUnit, int handleUnit) :
 	rudderMesh(rudderObj), rudderGeometry(&rudderMesh, GL_TRIANGLES), 
 	rudderDrawable(mat4(), &rudderMat, &rudderGeometry),
 	handleMesh(handleObj), handleGeometry(&handleMesh, GL_TRIANGLES), 
 	handleDrawable(mat4(), &handleMat, &handleGeometry)
 {
+	GLuint rudderTexture = createTexture(rudderImage);
+	loadTexture2DToUnit(rudderTexture, rudderUnit);
+	rudderMat.texUnit = rudderUnit;
+
+	GLuint handleTexture = createTexture(handleImage);
+	loadTexture2DToUnit(handleTexture, handleUnit);
+	handleMat.texUnit = handleUnit;
+
 	MeshInfoLoader pivotMesh(pivotObj);
 	pivotPoint = pivotMesh.vertices[0];
 	rudderDirection = vec3(0, 0, 1);

@@ -33,7 +33,7 @@ public:
 	Drawable ropeDrawable;
 	Drawable sheetDrawable;
 
-	Boom(char *boomObj, char *ropeObj, char *pivotObj, char *ropePointObj);
+	Boom(char *boomObj, char *ropeObj, char *pivotObj, char *ropePointObj, char *boomImage, char *ropeImage, int boomUnit, int ropeUnit);
 
 	void updateModelMatrix(const glm::mat4 &model_matrix);	//Boat's model matrix
 	void calculateBoomPosition(float dt);

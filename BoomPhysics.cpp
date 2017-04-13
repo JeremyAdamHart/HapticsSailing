@@ -1,5 +1,6 @@
 #include "BoomPhysics.h"
 #include <glm/gtx/transform.hpp>
+#include "Renderer.h"
 
 const float MAX_HALF_ANGLE = M_PI / 4.f;
 const float EXTRA_ROPE_AT_MAX = 0.5f;
@@ -9,11 +10,19 @@ const float BOOM_DAMPING = 1.f;
 const float ROPE_STIFFNESS = 4000.f;
 
 
-Boom::Boom(char *boomObj, char *ropeObj, char *pivotObj, char *ropePointObj)
+Boom::Boom(char *boomObj, char *ropeObj, char *pivotObj, char *ropePointObj, char *boomImage, char *ropeImage, int boomUnit, int ropeUnit)
 	:boomMesh(boomObj), boomGeometry(&boomMesh), ropeMesh(ropeObj), ropeGeometry(&ropeMesh),
 	boomVelocity(0.f), boomDrawable(mat4(), &boomMat, &boomGeometry), boomForce(0.f),
 	ropeDrawable(mat4(), &ropeMat, &ropeGeometry), sheetDrawable(mat4(), &ropeMat, &ropeGeometry)
 {
+	GLuint boomTexture = createTexture(boomImage);
+	loadTexture2DToUnit(boomTexture, boomUnit);
+	boomMat.texUnit = boomUnit;
+
+	GLuint ropeTexture = createTexture(ropeImage);
+	loadTexture2DToUnit(ropeTexture, ropeUnit);
+	ropeMat.texUnit = ropeUnit;
+
 	MeshInfoLoader pivotMesh(pivotObj);
 	pivotPoint = pivotMesh.vertices[0];
 

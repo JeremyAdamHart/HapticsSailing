@@ -27,6 +27,7 @@
 #include "MassSpring.h"
 #include "Rudder.h"
 #include "BoomPhysics.h"
+#include <soil/SOIL.h>
 
 #include <random>
 #include <float.h>
@@ -266,6 +267,10 @@ int main(int argc, char* argv[])
 	// SETUP
 	//--------------------------------------------------------------------------
 
+	//Loadtextures
+	GLuint shipTexture = createTexture("textures/ship.png");
+	GLuint sailTexture = createTexture("textures/sail.png");
+
 	mat4 projectionMatrix = perspectiveFov(fov, (float)width, (float)height, 0.01f, 1000.f);
 	TrackballCamera cam(
 		vec3(0, 0, -1),		//Direction
@@ -287,12 +292,15 @@ int main(int argc, char* argv[])
 
 	//SHIP INITIALIZATION
 	TorranceSparrow shipMat;
+	loadTexture2DToUnit(shipTexture, 1);
+	shipMat.texUnit = 1;
+	shipMat.texID = shipTexture;
 	shipMesh = MeshInfoLoader("models/ship.obj");
 	ElementGeometry shipContainer(&shipMesh, GL_TRIANGLES);
 	Drawable ship(mat4(), &shipMat, &shipContainer);
 
 	//SAIL
-	boom = new Boom("models/boom.obj", "models/rope.obj", "models/boomPivot.obj", "models/ropePoint.obj");
+	boom = new Boom("models/boom.obj", "models/rope.obj", "models/boomPivot.obj", "models/ropePoint.obj", "textures/boom.png", "textures/rope.jpg", 3, 4);
 	boom->updateModelMatrix(mat4());
 	MeshInfoLoader sailMesh ("models/sail.obj");
 	sailSpring = new MSSystem();
@@ -302,9 +310,12 @@ int main(int argc, char* argv[])
 	ElementGeometry sailGeometry;
 //	sailGeometry.mode = GL_LINES;
 	TorranceSparrow sailMat;
+	loadTexture2DToUnit(sailTexture, 2);
+	sailMat.texUnit = 2;
+	sailMat.texID = sailTexture;
 	sailSpring->loadToGeometryContainer(&sailGeometry);
 	sail = new Drawable(mat4(), &sailMat, &sailGeometry);
-	rudder = new RudderPhysics("models/rudder.obj", "models/handle.obj", "models/pivotPoint.obj");
+	rudder = new RudderPhysics("models/rudder.obj", "models/handle.obj", "models/pivotPoint.obj", "textures/Rudder.png", "textures/handle.png", 5, 6);
 
 	//WATER
 	vector<WaveFunction> randomWaves = generateRandomWaves();
@@ -344,7 +355,7 @@ int main(int argc, char* argv[])
 		glClearColor(0.6f, 0.8f, 1.0f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		printf("Graphics rate = %.2f, Haptics rate = %.2f\n", graphicsRate.getFrequency(), hapticsRate.getFrequency());
+//		printf("Graphics rate = %.2f, Haptics rate = %.2f\n", graphicsRate.getFrequency(), hapticsRate.getFrequency());
 
 		//Update matrices
 		water.model_matrix = translateMatrix(vec3(physicsShip->p.x, 0.f, physicsShip->p.z));

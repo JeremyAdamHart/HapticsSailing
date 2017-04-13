@@ -24,7 +24,7 @@ public:
 	Drawable rudderDrawable;
 	Drawable handleDrawable;
 
-	RudderPhysics(char *rudderObj, char *handleObj, char *pivotObj);
+	RudderPhysics(char *rudderObj, char *handleObj, char *pivotObj, char *rudderImage, char *handleImage, int rudderUnit, int handleUnit);
 	
 	void calculateRudderDirection(glm::vec3 handle, float dimension);
 	void updateModelMatrix(const glm::mat4 &model_matrix);	//Boat's model matrix

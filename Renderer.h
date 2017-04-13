@@ -30,6 +30,10 @@ struct Framebuffer{
 	void setDepthbuffer(GLuint renderbuffer);
 };
 
+void loadTexture2DToUnit(GLuint texID, int texUnit);
+
+GLuint createTexture(char *fileName);
+
 GLuint createEmptyTexture(unsigned int width, unsigned int height, GLint internalFormat, GLenum format, GLenum type);
 
 GLuint createDepthbuffer(unsigned int width, unsigned int height);

@@ -10,6 +10,9 @@ class TorranceSparrow : public Material {
 public:
 	TorranceSparrow();
 
+	int texUnit;
+	GLuint texID;
+
 	virtual GLint getProgram();
 	virtual void loadUniforms();
 	void deleteProgram();

@@ -3,6 +3,8 @@
 #include <iostream>
 
 #include "glSupport.h"
+//#include <soil/SOIL.h>
+#include <stb/stb_image.h>
 
 using namespace std;
 
@@ -43,6 +45,49 @@ void Framebuffer::setDepthbuffer(GLuint renderbuffer) {
 
 	depthID = renderbuffer;
 	depthAttachment = true;
+}
+
+
+GLuint createTexture(char* filename)
+{
+	int components;
+	GLuint texID;
+	int tWidth, tHeight;
+
+	glActiveTexture(GL_TEXTURE0);
+
+	//stbi_set_flip_vertically_on_load(true);
+	unsigned char* data = stbi_load(filename, &tWidth, &tHeight, &components, 0);
+
+	if (data != NULL)
+	{
+		glGenTextures(1, &texID);
+		glBindTexture(GL_TEXTURE_2D, texID);
+
+		if (components == 3)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tWidth, tHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		else if (components == 4)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tWidth, tHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		//Clean up
+		glBindTexture(GL_TEXTURE_2D, 0);
+		stbi_image_free(data);
+
+		return texID;
+	}
+
+	return 0;	//Error
+}
+
+void loadTexture2DToUnit(GLuint texID, int texUnit){
+	printf("ID = %d, Unit = %d\n", texID, texUnit);
+	glActiveTexture(GL_TEXTURE0 + texUnit);
+	glBindTexture(GL_TEXTURE_2D, texID);
 }
 
 GLuint createEmptyTexture(unsigned int width, unsigned int height, GLint internalFormat, GLenum format, GLenum type){
