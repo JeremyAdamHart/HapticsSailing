@@ -41,9 +41,11 @@ vec3 RudderPhysics::applyForce(RigidBody *object)
 	vec3 force = dot(object->v, normalize(normal_worldspace))
 		*normal_worldspace*10000.f;
 
+	force.y = 0.f;
+
 	object->addTorqueOnly(-force, position_worldspace);
 
-	return normal_modelspace*dot(object->v, normalize(normal_worldspace))*10000.f;
+	return normal_modelspace*dot(object->v, normalize(normal_worldspace))*100000.f;
 }
 
 void RudderPhysics::updateModelMatrix(const mat4 &model_matrix){

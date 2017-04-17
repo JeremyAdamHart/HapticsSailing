@@ -212,7 +212,7 @@ int main(int argc, char* argv[])
     glfwMakeContextCurrent(window);
 
     // sets the swap interval for the current display context
-    glfwSwapInterval(swapInterval);
+    glfwSwapInterval(1);
 
 /*	if (!gladLoadGL())
 	{
@@ -378,7 +378,7 @@ int main(int argc, char* argv[])
 		glClearColor(0.6f, 0.8f, 1.0f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//		printf("Graphics rate = %.2f, Haptics rate = %.2f\n", graphicsRate.getFrequency(), hapticsRate.getFrequency());
+		printf("Graphics rate = %.2f, Haptics rate = %.2f\n", graphicsRate.getFrequency(), hapticsRate.getFrequency());
 
 		//Update matrices
 		water.model_matrix = translateMatrix(vec3(physicsShip->p.x, 0.f, physicsShip->p.z));
@@ -511,7 +511,10 @@ void updateHaptics(void)
 	vec3 prevForceA(0.f);
 	vec3 prevForceB(0.f);
 
-	const float MAX_FORCE_DIFF = 0.5f;
+	const float MAX_FORCE_DIFF = 1.f;
+
+	const int REFRESH_BOUYANCY = 1;
+	int count = REFRESH_BOUYANCY;
 
 	// main haptic simulation loop
 	while (simulationRunning)
@@ -566,14 +569,20 @@ void updateHaptics(void)
 
 		vec3 rudderForce = rudder->applyForce(physicsShip)/50000.f;
 
-		sailSpring->applyWindForce(sail->model_matrix, vec3(0.f, 0.f, -12.f));
+		sailSpring->applyWindForce(sail->model_matrix, vec3(0.f, 0.f, -18.f));
 		sailSpring->solve(std::min(float(frameTime), 0.002f));
 		sailSpring->calculateNormals();
 
 		sailSpring->applyForcesToRigidBody(physicsShip);
 
-		waterBouyancy.addForces(boundingShip.data(), boundingShip.size(),
-			&buoyShip, physicsShip);
+	//	if (count >= REFRESH_BOUYANCY) {
+	//		physicsShip->clearRepeat();
+			waterBouyancy.addForces(boundingShip.data(), boundingShip.size(),
+				&buoyShip, physicsShip);
+	//		count = 0;
+	//	}
+
+		count++;
 
 		physicsShip->addGravityForces();
 		physicsShip->addDampingForces();

@@ -388,6 +388,7 @@ void MSSystem::applyForcesToRigidBody(RigidBody *object){
 	for (int i = 0; i < fixedForces.size(); i++){
 		vec3 pos_m = masses[fixedForces[i].massIndex].getPosition();
 		vec3 force = fixedForces[i].force;
+//		force.y = 0.f;
 
 		//Increase force in forward direction
 		force += 4.f*dot(force, forward)*forward;

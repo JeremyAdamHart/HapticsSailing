@@ -6,7 +6,7 @@ const float MAX_HALF_ANGLE = M_PI / 4.f;
 const float EXTRA_ROPE_AT_MAX = 0.5f;
 const float BOOM_SCALE = 0.5f;		//Relationship between boom length and rope position
 const float MASS = 1000.f;
-const float BOOM_DAMPING = 1.f;
+const float BOOM_DAMPING = 0.1f;
 const float ROPE_STIFFNESS = 4000.f;
 
 

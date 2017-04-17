@@ -4,8 +4,6 @@
 
 using namespace glm;
 
-const int UPDATE_COUNT = 5;
-
 static float rand01() { return float(rand()) / float(RAND_MAX); }
 
 WaterPhysics::WaterPhysics(Renderer *r, unsigned int width, unsigned int height, 

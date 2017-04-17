@@ -29,6 +29,20 @@ void RigidBody::addForce(vec3 f, vec3 loc){
 	torque += cross(r, f);
 }
 
+void RigidBody::addForceAndRepeat(vec3 f, vec3 loc) {
+	vec3 r = loc - p;
+	force += f;	// dot(f, r)*r / dot(r, r);
+	torque += cross(r, f);
+
+	repeatForces.push_back(f);
+	repeatTorques.push_back(torque);
+}
+
+void RigidBody::clearRepeat() {
+	repeatForces.clear();
+	repeatTorques.clear();
+}
+
 void RigidBody::addTorqueOnly(vec3 f, vec3 loc) {
 	vec3 r = loc - p;
 	torque += cross(r, f);
@@ -62,6 +76,13 @@ void RigidBody::resolveForces(float dt){
 
 	force = vec3(0.0);
 	torque = vec3(0.0);
+
+	for (int i = 0; i < repeatForces.size(); i++) {
+		force += repeatForces[i];
+	}
+	for (int i = 0; i < repeatTorques.size(); i++) {
+		torque += repeatTorques[i];
+	}
 }
 
 mat4 RigidBody::matrix(){ return translateMatrix(p)*mat4_cast(q); }
@@ -176,7 +197,8 @@ void RigidBody::addGravityForces() {
 
 void RigidBody::addDampingForces() {
 	vec3 forward = toVec3(matrix()*vec4(0, 0, 1, 0));
-	vec3 v_parallel = dot(v, forward)*forward;
+	forward.y = 0.f;
+	vec3 v_parallel = dot(v, normalize(forward))*forward;
 	vec3 v_perpendicular = v - v_parallel;
 
 	force += -v_perpendicular*DAMPING_LINEAR - v*v_parallel*DAMPING_LINEAR_FORWARDS;
