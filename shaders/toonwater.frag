@@ -32,7 +32,8 @@ const vec3 COLOR = vec3(0.1, 0.7, 1.0);
 
 const float WIDTH = 0.4;
 
-const float THRESHOLD = 0.000;
+const float CONTOUR_START = 0.08;
+const float CONTOUR_END = 0.02;
 
 vec3 df(WaveFunction w, vec2 pos, float t) {
 	float falloff = 1.0;	//clamp((50.0*w.speed - distance(pos, w.origin))/(w.speed*50.0), 0, 1);
@@ -99,10 +100,22 @@ void main(void)
 // 	color = normal;	//0.5*(normal + vec3(1, 1, 1));
 
  	//Draw grid lines
- 	if(((ModelPosition.x/WIDTH) - floor(ModelPosition.x/WIDTH) < WIDTH/8.f) ||
- 		((ModelPosition.z/WIDTH) - floor(ModelPosition.z/WIDTH) < WIDTH/8.f))
- 		color = vec3(0.1, 0.1, 0.1);
- 	//if(dot(normalize(TessNormal), normalize(camera_position - ModelPosition)) < THRESHOLD)
+ //	if(((ModelPosition.x/WIDTH) - floor(ModelPosition.x/WIDTH) < WIDTH/8.f) ||
+ 	//	((ModelPosition.z/WIDTH) - floor(ModelPosition.z/WIDTH) < WIDTH/8.f))
  	//	color = vec3(0.1, 0.1, 0.1);
+ 	vec3 projectedView = camera_position - ModelPosition;
+ 	projectedView.y = 0;
+ 	float dotNormalView = max(dot(normalize(normal), normalize(projectedView)), 0);
+
+ 	float contourStart = 100.0*CONTOUR_START/pow(distance(camera_position, ModelPosition), 2);
+	float contourEnd = 100.0*CONTOUR_END/pow(distance(camera_position, ModelPosition), 2);
+
+ 	if(dotNormalView < contourStart){
+ 		const vec3 CONTOUR_COLOR = vec3(0.9, 0.9, 0.9);
+
+		float u =max((dotNormalView - contourEnd)/(contourStart - contourEnd), 0);
+		color = (1-u)*CONTOUR_COLOR + u*color;
+ 	}
+
  	FragmentColour = vec4(color, 1);
 }

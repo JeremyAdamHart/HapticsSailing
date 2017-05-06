@@ -375,7 +375,7 @@ int main(int argc, char* argv[])
 	// setup callback when application exits
 	atexit(close);
 
-	cSleepMs(500.0);
+	cSleepMs(1000.0);
 
     //--------------------------------------------------------------------------
     // MAIN GRAPHIC LOOP
