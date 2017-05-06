@@ -5,7 +5,7 @@
 #include <ctime>
 #include <glm/gtc/type_ptr.hpp>
 
-const float MINIMUM_FORWARD_VELOCITY = 2.f;
+const float MINIMUM_FORWARD_VELOCITY = 0.f;
 
 using namespace glm;
 

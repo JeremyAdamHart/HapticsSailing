@@ -88,6 +88,9 @@
     <ClCompile Include="MassSpring.cpp">
       <Filter>Source Files\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleTexturedMaterial.cpp">
+      <Filter>Source Files\Materials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Drawable.h">
@@ -158,6 +161,9 @@
     </ClInclude>
     <ClInclude Include="MassSpring.h">
       <Filter>Source Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleTexturedMaterial.h">
+      <Filter>Source Files\Materials</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,8 +3,12 @@
 // first output is mapped to the framebuffer's colour index by default
 out vec4 FragmentColour;
 
+uniform sampler2D colorTexture;
+
+in vec2 FragmentTexCoord;
+
 void main(void)
 {
     // write colour output without modification
-    FragmentColour = vec4(1, 0, 0, 1);
+    FragmentColour = texture(colorTexture, FragmentTexCoord);
 }

@@ -43,10 +43,10 @@ vec3 TrackerCamera::getPosition() const
 void TrackerCamera::trackGeometryXZ(glm::vec3 *vertices, size_t numVertices, const glm::mat4 &model_matrix)
 {
 	float bottom_geometry = std::numeric_limits<float>::max();
-	float top_geometry = std::numeric_limits<float>::min();
+	float top_geometry = -std::numeric_limits<float>::max();
 	float left_geometry = std::numeric_limits<float>::max();
-	float right_geometry = std::numeric_limits<float>::min();
-	float ytop_geometry = std::numeric_limits<float>::min();
+	float right_geometry = -std::numeric_limits<float>::max();
+	float ytop_geometry = -std::numeric_limits<float>::max();
 	float ybottom_geometry = std::numeric_limits<float>::max();
 
 

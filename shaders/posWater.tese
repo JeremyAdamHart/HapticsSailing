@@ -28,12 +28,12 @@ vec3 df(WaveFunction w, vec2 pos, float t) {
 	float cosValue = falloff*cos(2.f*M_PI*dot(w.dir, (pos - w.origin)) / (w.wavelength) + w.speed*t*2.f*M_PI);
 	vec3 df_dx = vec3(
 		1, 
-		(w.height*2.0*M_PI/w.wavelength)*(pos.x - w.origin.x)*cosValue,
+		(w.height*2.0*M_PI*w.dir.x/w.wavelength)*cosValue,
 		0);
 
 	vec3 df_dz = vec3(
 		0,
-		(w.height*2.0*M_PI/w.wavelength)*(pos.y - w.origin.y)*cosValue,
+		(w.height*2.0*M_PI*w.dir.y/w.wavelength)*cosValue,
 		1);
 
 	return cross(df_dz, df_dx);

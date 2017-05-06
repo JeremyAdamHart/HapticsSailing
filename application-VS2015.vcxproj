@@ -44,6 +44,7 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SimpleGeometry.cpp" />
     <ClCompile Include="SimpleMaterial.cpp" />
+    <ClCompile Include="SimpleTexturedMaterial.cpp" />
     <ClCompile Include="ToonWater.cpp" />
     <ClCompile Include="TorranceSparrow.cpp" />
     <ClCompile Include="TrackballCamera.cpp" />
@@ -69,6 +70,7 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SimpleGeometry.h" />
     <ClInclude Include="SimpleMaterial.h" />
+    <ClInclude Include="SimpleTexturedMaterial.h" />
     <ClInclude Include="ToonWater.h" />
     <ClInclude Include="TorranceSparrow.h" />
     <ClInclude Include="TrackballCamera.h" />

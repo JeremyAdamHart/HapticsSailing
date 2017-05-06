@@ -37,7 +37,7 @@ vec3 df(WaveFunction w, vec2 pos, float t) {
 		(w.height*2.0*M_PI/w.wavelength)*(pos.y - w.origin.y)*cosValue,
 		1);
 
-	return cross(df_dz, df_dx);
+	return normalize(cross(df_dz, df_dx));
 }
 
 void main()

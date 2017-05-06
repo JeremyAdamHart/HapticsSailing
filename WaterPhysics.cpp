@@ -23,6 +23,7 @@ WaterPhysics::WaterPhysics(Renderer *r, unsigned int width, unsigned int height,
 	waterGeom = SimpleGeometry(waterPoints.data(), waterPoints.size(), GL_PATCHES);
 
 	fb = createPositionFramebuffer(width, height);
+	bouyancyLines.resize(width*height*2);
 
 	//Texture copy buffers
 	topObject.resize(width*height, vec3(0.f));
@@ -39,6 +40,8 @@ vector<WaveFunction> generateRandomWaves() {
 	float speedRange = 0.3f;
 
 	vector<WaveFunction> waves;
+
+	srand(time(0));
 
 	//Generate wind directions
 	for (int i = 0; i < MAX_WAVE_NUMBER; i++) {
@@ -85,12 +88,13 @@ void WaterPhysics::addForces(glm::vec3 *vertices, size_t numVertices, Drawable *
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Draw water surface
+	glDepthFunc(GL_LEQUAL);
+	water.model_matrix = translateMatrix(vec3(cam.pos.x, 0.f, cam.pos.z));
 	r->draw(cam, &water);
 	glBindTexture(GL_TEXTURE_2D, fb.texID);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, waterSurface.data());
 	
 	//Return state
-	glDepthFunc(GL_LEQUAL);
 	r->useDefaultFramebuffer();
 
 	//Apply forces
@@ -109,7 +113,17 @@ void WaterPhysics::addForces(glm::vec3 *vertices, size_t numVertices, Drawable *
 			if (depth >= 0.00001f)
 			{
 				pObject->addForce(-GRAVITY*depth*xWidth*zWidth*WATER_DENSITY, bottomObject[i]);	
+				bouyancyLines[2 * i] = bottomObject[i];
+				bouyancyLines[2 * i + 1] = bottomObject[i] + vec3(0, depth, 0)*1000.f;
 			}
+			else {
+				bouyancyLines[2 * i] = vec3(0.f);
+				bouyancyLines[2 * i + 1] = vec3(0.f);
+			}
+		}
+		else {
+			bouyancyLines[2 * i] = vec3(0.f);
+			bouyancyLines[2 * i + 1] = vec3(0.f);
 		}
 	}
 

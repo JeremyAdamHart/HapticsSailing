@@ -33,7 +33,7 @@ void PosObject::loadUniforms()
 }
 
 PosWater::PosWater(vector<WaveFunction> *waves, float *timeElapsed) :
-waves(waves), timeElapsed(timeElapsed)
+waves(waves), timeElapsed(timeElapsed), waveUniformsLoaded(false)
 {
 	if (program == 0)
 		initializeShader();
@@ -64,26 +64,31 @@ void PosWater::deleteProgram() { glDeleteProgram(program); }
 
 void PosWater::loadUniforms()
 {
+
 	glUseProgram(program);
 
 	GLint uniformLocation;
 
-	for (int i = 0; i < glm::min(int(waves->size()), MAX_WAVE_NUMBER); i++) {
-		WaveFunction *wave = &(*waves)[i];
-		uniformLocation = glGetUniformLocation(program, str("waves[%d].dir", i).c_str());
-		glUniform2f(uniformLocation, wave->dir.x, wave->dir.y);
+	if (true){	//!waveUniformsLoaded) {
+		for (int i = 0; i < glm::min(int(waves->size()), MAX_WAVE_NUMBER); i++) {
+			WaveFunction *wave = &(*waves)[i];
+			uniformLocation = glGetUniformLocation(program, str("waves[%d].dir", i).c_str());
+			glUniform2f(uniformLocation, wave->dir.x, wave->dir.y);
 
-		uniformLocation = glGetUniformLocation(program, str("waves[%d].origin", i).c_str());
-		glUniform2f(uniformLocation, wave->origin.x, wave->origin.y);
+			uniformLocation = glGetUniformLocation(program, str("waves[%d].origin", i).c_str());
+			glUniform2f(uniformLocation, wave->origin.x, wave->origin.y);
 
-		uniformLocation = glGetUniformLocation(program, str("waves[%d].wavelength", i).c_str());
-		glUniform1f(uniformLocation, wave->wavelength);
+			uniformLocation = glGetUniformLocation(program, str("waves[%d].wavelength", i).c_str());
+			glUniform1f(uniformLocation, wave->wavelength);
 
-		uniformLocation = glGetUniformLocation(program, str("waves[%d].speed", i).c_str());
-		glUniform1f(uniformLocation, wave->speed);
+			uniformLocation = glGetUniformLocation(program, str("waves[%d].speed", i).c_str());
+			glUniform1f(uniformLocation, wave->speed);
 
-		uniformLocation = glGetUniformLocation(program, str("waves[%d].height", i).c_str());
-		glUniform1f(uniformLocation, wave->height);
+			uniformLocation = glGetUniformLocation(program, str("waves[%d].height", i).c_str());
+			glUniform1f(uniformLocation, wave->height);
+		}
+
+		waveUniformsLoaded = true;
 	}
 
 	float t = *timeElapsed;

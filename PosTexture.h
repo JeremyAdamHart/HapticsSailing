@@ -17,6 +17,8 @@ public:
 
 class PosWater : public Material{
 	static GLint program;
+	bool waveUniformsLoaded;
+
 	void initializeShader();
 public:
 	PosWater(vector<WaveFunction> *waves = nullptr, float *timeElapsed = nullptr);

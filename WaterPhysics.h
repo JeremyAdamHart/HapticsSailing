@@ -33,6 +33,8 @@ class WaterPhysics{
 public:
 	std::vector<WaveFunction> waves;
 	
+	vector<vec3> bouyancyLines;
+
 	Drawable renderable;
 
 	WaterPhysics(Renderer *r, unsigned int width=20, unsigned int height=20, float *timeElapsed=NULL);

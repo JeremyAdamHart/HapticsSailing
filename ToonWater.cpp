@@ -25,6 +25,7 @@ void ToonWater::initializeShader()
 										GL_VERTEX_SHADER);
 	cout << "Compiling toonwater.frag" << endl;
 	GLuint fragmentShader = createShader(fileToString("shaders/toonwater.frag"), 
+										waveNumberDefine,
 										GL_FRAGMENT_SHADER);
 	cout << "Compiling toonwater.tesc" << endl;
 	GLuint tessControlShader = createShader(fileToString("shaders/toonwater.tesc"), 

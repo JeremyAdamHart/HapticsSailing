@@ -39,6 +39,9 @@ using namespace glm;
 
 //unsigned int fp_control_state = _controlfp(_EM_INEXACT, _MCW_EM);
 
+const int BOUYANCY_PIXEL_WIDTH = 50;
+const int BOUYANCY_PIXEL_HEIGHT = 50;
+
 //------------------------------------------------------------------------------
 // GENERAL SETTINGS
 //------------------------------------------------------------------------------
@@ -149,6 +152,8 @@ MeshInfoLoader shipCollisionMesh;
 
 cFrequencyCounter graphicsRate;
 cFrequencyCounter hapticsRate;
+
+vec3 bouyancyLines[BOUYANCY_PIXEL_WIDTH*BOUYANCY_PIXEL_HEIGHT*2];
 
 float timeElapsed = 0.f;
 
@@ -354,6 +359,11 @@ int main(int argc, char* argv[])
 
 	checkGLErrors("Pre loop");
 
+	//DEBUGGING
+	SimpleGeometry bouyDebugGeom(bouyancyLines, BOUYANCY_PIXEL_WIDTH*BOUYANCY_PIXEL_HEIGHT, GL_LINES);
+	SimpleMaterial bouyDebugMat;
+	Drawable bouyDebug(mat4(), &bouyDebugMat, &bouyDebugGeom);
+
 	//--------------------------------------------------------------------------
 	// START SIMULATION
 	//--------------------------------------------------------------------------
@@ -365,7 +375,7 @@ int main(int argc, char* argv[])
 	// setup callback when application exits
 	atexit(close);
 
-	cSleepMs(1000.0);
+	cSleepMs(500.0);
 
     //--------------------------------------------------------------------------
     // MAIN GRAPHIC LOOP
@@ -378,7 +388,7 @@ int main(int argc, char* argv[])
 		glClearColor(0.6f, 0.8f, 1.0f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		printf("Graphics rate = %.2f, Haptics rate = %.2f\n", graphicsRate.getFrequency(), hapticsRate.getFrequency());
+		//printf("Graphics rate = %.2f, Haptics rate = %.2f\n", graphicsRate.getFrequency(), hapticsRate.getFrequency());
 
 		//Update matrices
 		water.model_matrix = translateMatrix(vec3(physicsShip->p.x, 0.f, physicsShip->p.z));
@@ -396,7 +406,7 @@ int main(int argc, char* argv[])
 		ris.draw(cam, &ship);
 
 		ris.draw(cam, sail);
-
+		
 		ris.draw(cam, &water);
 		
 		ris.draw(cam, &rudder->rudderDrawable);
@@ -405,6 +415,15 @@ int main(int argc, char* argv[])
 		ris.draw(cam, &boom->boomDrawable);
 		ris.draw(cam, &boom->sheetDrawable);
 		ris.draw(cam, &boom->ropeDrawable);
+
+		printf("P(%f, %f, %f)\n", 
+			physicsShip->p.x, physicsShip->p.y, physicsShip->p.z);
+
+		glDepthFunc(GL_ALWAYS);
+		glLineWidth(2.f);
+		bouyDebugGeom.loadGeometry(bouyancyLines, BOUYANCY_PIXEL_WIDTH*BOUYANCY_PIXEL_HEIGHT*2);
+		ris.draw(cam, &bouyDebug);
+		glDepthFunc(GL_LEQUAL);
 
 		graphicsRate.signal(1);
 
@@ -490,8 +509,11 @@ void updateHaptics(void)
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
-	WaterPhysics waterBouyancy(&hapticsRenderer, 20, 20, &timeElapsed);
+	WaterPhysics waterBouyancy(&hapticsRenderer, BOUYANCY_PIXEL_WIDTH, BOUYANCY_PIXEL_HEIGHT, &timeElapsed);
 	waterBouyancy.waves = *waves;
+
+	//bouyancyLines = waterBouyancy.bouyancyLines;
+	memcpy(bouyancyLines, &waterBouyancy.bouyancyLines[0], BOUYANCY_PIXEL_WIDTH * BOUYANCY_PIXEL_HEIGHT);
 
 
 	float mass = 12000;
@@ -562,7 +584,7 @@ void updateHaptics(void)
 		if (boomForceDiff > MAX_FORCE_DIFF)
 			boomForce = prevForceB + normalize(boomForce - prevForceB)*MAX_FORCE_DIFF;
 		prevForceB = boomForce;
-		bHapticDevice->setForce(toCVector3d(boomForce));
+		//bHapticDevice->setForce(toCVector3d(boomForce));
 
 
 		rudder->calculateRudderDirection(toolPos, 0.05);
@@ -579,6 +601,10 @@ void updateHaptics(void)
 	//		physicsShip->clearRepeat();
 			waterBouyancy.addForces(boundingShip.data(), boundingShip.size(),
 				&buoyShip, physicsShip);
+
+			//DEBUG
+			memcpy(bouyancyLines, &waterBouyancy.bouyancyLines[0], 
+				BOUYANCY_PIXEL_WIDTH * BOUYANCY_PIXEL_HEIGHT*2*sizeof(vec3));
 	//		count = 0;
 	//	}
 
@@ -612,7 +638,7 @@ void updateHaptics(void)
 		prevForceA = rudderForce;
 
 		// send computed force, torque, and gripper force to haptic device
-		hapticDevice->setForce(toCVector3d(rudderForce));
+		//hapticDevice->setForce(toCVector3d(rudderForce));
 
 		// signal frequency counter
 		hapticsRate.signal(1);

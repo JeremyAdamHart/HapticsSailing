@@ -45,7 +45,7 @@ vector<WaveFunction> randomWaveSet(int numWaves){
 	{
 		float speed = 1.f / (pow(1.2f, float(i)));
 		float wavelength = 10.f*speed;
-		float height = wavelength / 40.f;
+		float height = wavelength / 40.f*5.f;
 		vec2 origin = 2.f*range*(vec2(rand01() - 0.5f, rand01() - 0.5f));
 		vec2 dir = normalize(vec2(rand01() - 0.5f, rand01() - 0.5f));
 
