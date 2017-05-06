@@ -104,11 +104,11 @@ void main(void)
  	//	((ModelPosition.z/WIDTH) - floor(ModelPosition.z/WIDTH) < WIDTH/8.f))
  	//	color = vec3(0.1, 0.1, 0.1);
  	vec3 projectedView = camera_position - ModelPosition;
- 	projectedView.y = 0;
+// 	projectedView.y = 0;
  	float dotNormalView = max(dot(normalize(normal), normalize(projectedView)), 0);
 
- 	float contourStart = 100.0*CONTOUR_START/pow(distance(camera_position, ModelPosition), 2);
-	float contourEnd = 100.0*CONTOUR_END/pow(distance(camera_position, ModelPosition), 2);
+ 	float contourStart = 50.0*CONTOUR_START/pow(distance(camera_position, ModelPosition), 1);
+	float contourEnd = 50.0*CONTOUR_END/pow(distance(camera_position, ModelPosition), 1);
 
  	if(dotNormalView < contourStart){
  		const vec3 CONTOUR_COLOR = vec3(0.9, 0.9, 0.9);
