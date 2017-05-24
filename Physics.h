@@ -6,7 +6,7 @@
 #include "MeshInfoLoader.h"
 
 const float DAMPING_LINEAR = 5000.f;
-const float DAMPING_LINEAR_FORWARDS = 0.f;
+const float DAMPING_LINEAR_FORWARDS = 2.f;
 const float DAMPING_ANGULAR = 100000.f;
 const glm::vec3 GRAVITY(0, -9.81, 0);
 

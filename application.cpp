@@ -419,11 +419,11 @@ int main(int argc, char* argv[])
 		printf("P(%f, %f, %f)\n", 
 			physicsShip->p.x, physicsShip->p.y, physicsShip->p.z);
 
-		glDepthFunc(GL_ALWAYS);
+/*		glDepthFunc(GL_ALWAYS);
 		glLineWidth(2.f);
 		bouyDebugGeom.loadGeometry(bouyancyLines, BOUYANCY_PIXEL_WIDTH*BOUYANCY_PIXEL_HEIGHT*2);
 		ris.draw(cam, &bouyDebug);
-		glDepthFunc(GL_LEQUAL);
+		glDepthFunc(GL_LEQUAL);*/
 
 		graphicsRate.signal(1);
 
@@ -584,7 +584,7 @@ void updateHaptics(void)
 		if (boomForceDiff > MAX_FORCE_DIFF)
 			boomForce = prevForceB + normalize(boomForce - prevForceB)*MAX_FORCE_DIFF;
 		prevForceB = boomForce;
-		//bHapticDevice->setForce(toCVector3d(boomForce));
+		bHapticDevice->setForce(toCVector3d(boomForce));
 
 
 		rudder->calculateRudderDirection(toolPos, 0.05);
@@ -613,7 +613,7 @@ void updateHaptics(void)
 		physicsShip->addGravityForces();
 		physicsShip->addDampingForces();
 
-		physicsShip->resolveForces(std::min(float(frameTime), 0.002f));
+	//	physicsShip->resolveForces(std::min(float(frameTime), 0.002f));
 		buoyShip.model_matrix = physicsShip->matrix();
 
 		timeElapsed += float(std::min(float(frameTime), 0.002f));
@@ -638,7 +638,7 @@ void updateHaptics(void)
 		prevForceA = rudderForce;
 
 		// send computed force, torque, and gripper force to haptic device
-		//hapticDevice->setForce(toCVector3d(rudderForce));
+		hapticDevice->setForce(toCVector3d(rudderForce));
 
 		// signal frequency counter
 		hapticsRate.signal(1);

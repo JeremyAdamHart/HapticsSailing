@@ -100,9 +100,9 @@ void main(void)
 // 	color = normal;	//0.5*(normal + vec3(1, 1, 1));
 
  	//Draw grid lines
- //	if(((ModelPosition.x/WIDTH) - floor(ModelPosition.x/WIDTH) < WIDTH/8.f) ||
- 	//	((ModelPosition.z/WIDTH) - floor(ModelPosition.z/WIDTH) < WIDTH/8.f))
- 	//	color = vec3(0.1, 0.1, 0.1);
+ 	if(((ModelPosition.x/WIDTH) - floor(ModelPosition.x/WIDTH) < WIDTH/8.f) ||
+ 		((ModelPosition.z/WIDTH) - floor(ModelPosition.z/WIDTH) < WIDTH/8.f))
+ 		color = vec3(0.1, 0.1, 0.1);
  	vec3 projectedView = camera_position - ModelPosition;
 // 	projectedView.y = 0;
  	float dotNormalView = max(dot(normalize(normal), normalize(projectedView)), 0);

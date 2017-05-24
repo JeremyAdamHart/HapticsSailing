@@ -3,6 +3,15 @@
 #include <chai3d.h>
 #include <GLFW/glfw3.h>
 
+struct ATTRIB_LOCATION {
+	enum{
+		POSITION=0,
+		NORMAL,
+		TEX_COORD,
+		COLOR,
+			};
+};
+
 class GLGeometryContainer{
 protected:
 	GLGeometryContainer(){}
