@@ -16,7 +16,6 @@ class Boom {
 	TorranceSparrow ropeMat;
 
 	glm::vec3 pivotPoint;
-	glm::vec3 boomPosition;
 	float boomVelocity;
 	float boomLength;
 	float boomForce;
@@ -29,6 +28,7 @@ class Boom {
 	glm::vec3 handlePoint;
 
 public:
+	glm::vec3 boomPosition;
 	Drawable boomDrawable;
 	Drawable ropeDrawable;
 	Drawable sheetDrawable;

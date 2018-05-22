@@ -98,10 +98,11 @@ vec3 Boom::updateHandleAndGetForce(vec3 handle, float dimension)
 	return length(force)*normalize(ropePoint - handlePoint)*dimension/handleRange;
 }
 
+//Bodyspace?
 void Boom::addForceToBoom(vec3 force) {
 	vec3 perpendicular = normalize(vec3(boomPosition.z - pivotPoint.z, 0.f, pivotPoint.x - boomPosition.x));
 	boomForce += dot(force, perpendicular);
-	printf("BoomForce = %f\n", dot(force, perpendicular));
+//	printf("BoomForce = %f\n", dot(force, perpendicular));
 }
 
 void Boom::calculateBoomPosition(float dt) {

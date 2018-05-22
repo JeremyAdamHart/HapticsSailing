@@ -145,6 +145,8 @@ Boom *boom;
 MSSystem *sailSpring;
 vector<WaveFunction> *waves;
 
+vector<vec3>* debugLinePtr;
+
 Drawable *sail;
 
 MeshInfoLoader shipMesh;
@@ -364,6 +366,12 @@ int main(int argc, char* argv[])
 	SimpleMaterial bouyDebugMat;
 	Drawable bouyDebug(mat4(), &bouyDebugMat, &bouyDebugGeom);
 
+	vector<vec3> debugLinePoints = { vec3(0), vec3(0, 3, 0) };
+	debugLinePtr = &debugLinePoints;
+	SimpleGeometry debugLineGeom(debugLinePoints.data(), 2, GL_LINES);
+	SimpleMaterial debugLineMat;
+	Drawable debugLines(mat4(1.f), &debugLineMat, &debugLineGeom);
+
 	//--------------------------------------------------------------------------
 	// START SIMULATION
 	//--------------------------------------------------------------------------
@@ -415,6 +423,11 @@ int main(int argc, char* argv[])
 		ris.draw(cam, &boom->boomDrawable);
 		ris.draw(cam, &boom->sheetDrawable);
 		ris.draw(cam, &boom->ropeDrawable);
+
+		//Debugging
+		debugLineGeom.loadGeometry(debugLinePoints.data(), debugLinePoints.size());
+		glLineWidth(4.f);
+		ris.draw(cam, &debugLines);
 
 		printf("P(%f, %f, %f)\n", 
 			physicsShip->p.x, physicsShip->p.y, physicsShip->p.z);
@@ -515,7 +528,6 @@ void updateHaptics(void)
 	//bouyancyLines = waterBouyancy.bouyancyLines;
 	memcpy(bouyancyLines, &waterBouyancy.bouyancyLines[0], BOUYANCY_PIXEL_WIDTH * BOUYANCY_PIXEL_HEIGHT);
 
-
 	float mass = 12000;
 	shipCollisionMesh = MeshInfoLoader("models/shipCollision.obj");
 	physicsShip = new RigidBody(mass, calculateInertialTensor(&shipCollisionMesh, mass));
@@ -575,9 +587,13 @@ void updateHaptics(void)
 
 		vec3 boomForce = boom->updateHandleAndGetForce(bToolPos, 0.05);
 		vec3 sailForceOnBoom = sailSpring->getBoomForce()/10.f;
-		boom->addForceToBoom(toVec3(inverse(physicsShip->matrix())*vec4(sailForceOnBoom, 1.f)));
+		boom->addForceToBoom(toVec3(inverse(physicsShip->matrix())*vec4(sailForceOnBoom, 0.f)));
 		boom->calculateBoomPosition(frameTime);
 		sailSpring->setBoomEndPoint(boom->getBoomEndpointWorld());
+
+		//DEBUG - Visualize boom force from sail
+//		debugLinePtr->at(0) = toVec3(physicsShip->matrix()*vec4(boom->boomPosition, 1.f));
+//		debugLinePtr->at(1) = debugLinePtr->at(0) + toVec3(physicsShip->matrix()*vec4(sailForceOnBoom, 0 .f));
 
 		//Apply boom force
 		float boomForceDiff = length(boomForce - prevForceB);
@@ -613,7 +629,7 @@ void updateHaptics(void)
 		physicsShip->addGravityForces();
 		physicsShip->addDampingForces();
 
-	//	physicsShip->resolveForces(std::min(float(frameTime), 0.002f));
+		physicsShip->resolveForces(std::min(float(frameTime), 0.002f));
 		buoyShip.model_matrix = physicsShip->matrix();
 
 		timeElapsed += float(std::min(float(frameTime), 0.002f));
