@@ -65,13 +65,17 @@ void RigidBody::resolveForces(float dt){
 
 	//printf("Force (%.2f, %.2f, %.2f)\n", force.x, force.y, force.z);
 
+	//I might have broke something, compare to RenderingEngine Physics.cpp
 	//Rotational integration
 	mat3 IinvWorld = mat3_cast(q)*Iinv*transpose(mat3_cast(q));
-	vec3 ddt_omega = IinvWorld*torque;
+	vec3 ddt_omega = torque;
 	omega += ddt_omega*dt;
-	quat omegaQ (0, omega.x, omega.y, omega.z);
 
-	q += dt*0.5f*omegaQ*q;
+	vec3 angVelocityV = IinvWorld*omega;	//World space
+	quat angVelocityQ (0, angVelocityV.x, angVelocityV.y, angVelocityV.z);
+
+	q += dt*0.5f*angVelocityQ*q;
+
 	q = normalize(q);
 
 	force = vec3(0.0);
