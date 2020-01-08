@@ -7,6 +7,7 @@ uniform float elapsedTime;
 
 out vec3 TessNormal;
 out vec3 ModelPosition;
+out vec3 RestPosition;
 
 struct WaveFunction
 {
@@ -50,6 +51,8 @@ void main()
 
 	vec3 position = (1-v)*py0 + v*py1;
 	vec3 color = vec3(0, 0, 0);
+
+	RestPosition = position;
 
 	for(int i=0; i<MAX_WAVE_NUMBER; i++){
 		position += vec3(0, f(waves[i], vec2(position.x, position.z), elapsedTime), 0);

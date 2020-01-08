@@ -6,6 +6,7 @@ out vec4 FragmentColour;
 
 in vec3 TessNormal;
 in vec3 ModelPosition;
+in vec3 RestPosition;
 
 
 uniform vec3 camera_position;
@@ -24,8 +25,8 @@ struct WaveFunction
 uniform WaveFunction waves [MAX_WAVE_NUMBER];
 
 vec3 lightPos = vec3(1000.0, 1000.0, 1000.0);
-float ks = 0.5;
-float kd = 0.4;
+float ks = 0.3;
+float kd = 0.3;
 float alpha = 5.0;
 float ka = 0.6;
 const vec3 COLOR = vec3(0.1, 0.7, 1.0);
@@ -34,6 +35,88 @@ const float WIDTH = 0.4;
 
 const float CONTOUR_START = 0.08;
 const float CONTOUR_END = 0.02;
+
+//////////////////////
+// Foam Perlin noise
+/////////////////////
+
+#define MOD_MAX 8388608
+
+//Perlin noise values
+uniform int octaveNum = 5;
+uniform float baseWidth = 20.0;
+uniform float persistance = 0.5;
+uniform int seedValue = 71;
+
+int hash( int x ) {
+    x += ( x << 10 );
+    x ^= ( x >>  6 );
+    x += ( x <<  3 );
+    x ^= ( x >> 11 );
+    x += ( x << 15 );
+    return x;
+}
+
+vec2 gradient(int i, int j, int seed){
+	int rand = hash(hash(seed+i)+j)%MOD_MAX;
+	float theta = 2.0*M_PI*float(rand)/float(MOD_MAX);
+	return vec2(sin(theta), cos(theta));
+}
+
+float fade(float t){
+	return t*t*t*(t*(t*6 - 15) + 10);
+}
+
+float generateNoise(float x, float y, float width, int seed){
+	int i = int(x/width);
+	int j = int (y/width);
+	float x_r = mod(x, width)/width;
+	float y_r = mod(y, width)/width;
+
+	vec2 g00 = gradient(i, j, seed);
+	vec2 g01 = gradient(i+1, j, seed);
+	vec2 g10 = gradient(i, j+1, seed);
+	vec2 g11 = gradient(i+1, j+1, seed);
+
+	float v00 = dot(g00, vec2(0, 0) - vec2(x_r, y_r));
+	float v01 = dot(g01, vec2(1, 0) - vec2(x_r, y_r));
+	float v10 = dot(g10, vec2(0, 1) - vec2(x_r, y_r));
+	float v11 = dot(g11, vec2(1, 1) - vec2(x_r, y_r));
+
+	float s = fade(x_r);
+	float t = fade(y_r);
+
+	//Bilinear interpolation
+	float v0 = (1-s)*v00 + s*v01;
+	float v1 = (1-s)*v10 + s*v11;
+	return (1-t)*v0 + t*v1;
+}
+
+float spots(vec2 coord, float noise, float period){
+	return (sin((noise+coord.x)*2.0*M_PI/period)+1.0)*0.5 * 
+			(sin((noise+coord.y)*2.0*M_PI/period)+1.0)*0.5;
+}
+
+float perlinNoise(vec2 coord){
+	float noise = 0.0;
+	for(int i=0; i<octaveNum; i++){
+		float weight = pow(persistance, i+1);
+		float width = baseWidth*pow(0.5, i);
+		noise += (generateNoise(coord.x, coord.y, width, seedValue)+0.5)*weight;
+	}
+
+	float turbulence = 30.0;
+//	float intensity = noise;
+//	float intensity = sin((coord.x + coord.y+noise*turbulence)*1.0)*0.5 + 0.5;
+	float intensity = spots(coord, noise*turbulence, 5.0);
+//	return sin(coord.x + coord.y);
+	return intensity;
+}
+
+
+//////////////////////////////
+// Done noise
+//////////////////////////////
 
 vec3 df(WaveFunction w, vec2 pos, float t) {
 	float falloff = 1.0;	//clamp((50.0*w.speed - distance(pos, w.origin))/(w.speed*50.0), 0, 1);
@@ -97,12 +180,17 @@ void main(void)
 	normal = normalize(normal);
 
  	vec3 color = torranceSparrowLighting(normal, ModelPosition, camera_position)*COLOR;
+
+ 	color += perlinNoise(RestPosition.xz)*vec3(0.1);
+
 // 	color = normal;	//0.5*(normal + vec3(1, 1, 1));
 
  	//Draw grid lines
+ 	/*
  	if(((ModelPosition.x/WIDTH) - floor(ModelPosition.x/WIDTH) < WIDTH/8.f) ||
  		((ModelPosition.z/WIDTH) - floor(ModelPosition.z/WIDTH) < WIDTH/8.f))
  		color = vec3(0.1, 0.1, 0.1);	//
+ 		*/
  	vec3 projectedView = camera_position - ModelPosition;
 // 	projectedView.y = 0;
  	float dotNormalView = max(dot(normalize(normal), normalize(projectedView)), 0);
@@ -114,7 +202,7 @@ void main(void)
  		const vec3 CONTOUR_COLOR = vec3(0.9, 0.9, 0.9);
 
 		float u =max((dotNormalView - contourEnd)/(contourStart - contourEnd), 0);
-		color = (1-u)*CONTOUR_COLOR + u*color;
+		//color = (1-u)*CONTOUR_COLOR + u*color;
  	}
 
  	FragmentColour = vec4(color, 1);

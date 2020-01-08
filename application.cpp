@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
 
 	Renderer ris;
 
-	GLFWwindow *window = ris.createWindow();
+	GLFWwindow *window = ris.createWindow(1920, 1080);
 
 	if (window == NULL)
 		return -1;

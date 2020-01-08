@@ -67,7 +67,7 @@ void RigidBody::resolveForces(float dt){
 
 	//I might have broke something, compare to RenderingEngine Physics.cpp
 	//Rotational integration
-	mat3 IinvWorld = mat3_cast(q)*Iinv*transpose(mat3_cast(q));
+/*	mat3 IinvWorld = mat3_cast(q)*Iinv*transpose(mat3_cast(q));
 	vec3 ddt_omega = torque;
 	omega += ddt_omega*dt;
 
@@ -75,6 +75,38 @@ void RigidBody::resolveForces(float dt){
 	quat angVelocityQ (0, angVelocityV.x, angVelocityV.y, angVelocityV.z);
 
 	q += dt*0.5f*angVelocityQ*q;
+*/
+
+	/* From Physics.cpp
+
+	//Linear integration
+	v += (force/mass)*dt;
+	position += v*dt;
+
+	//Rotational integration - Body space to world space
+	mat3 IinvWorld = mat3_cast(orientation)*Iinv*transpose(mat3_cast(orientation));
+	vec3 ddt_omega = torque;		//World space
+	omega += ddt_omega*dt;					//World space
+	vec3 angVelocityV = IinvWorld*omega;	//World space
+	quat angVelocityQ (0, angVelocityV.x, angVelocityV.y, angVelocityV.z);
+
+	orientation += dt*	0.5f*angVelocityQ*orientation;
+	orientation = normalize(orientation);
+
+	force = vec3(0.0);
+	torque = vec3(0.0);
+	
+	*/
+
+//I might have broke something, compare to RenderingEngine Physics.cpp
+//Rotational integration
+	mat3 IinvWorld = mat3_cast(q)*Iinv*transpose(mat3_cast(q));
+	vec3 ddt_omega = IinvWorld*torque;
+
+	omega += ddt_omega*dt;
+	quat omegaQ(0, omega.x, omega.y, omega.z);
+
+	q += dt*0.5f*omegaQ*q;
 
 	q = normalize(q);
 
