@@ -14,3 +14,7 @@ The boat is modeled as a rigid body with boyancy calculated by measuring the dif
 
 <h3>Sail</h3>
 The sail of the ship is modeled with a mass spring model using the method described in Deformation constraints in a mass-spring model to describe rigid cloth behaviour by Xavier Provot to calculate interactions with wind. The force applied to the attached masses to the ship are transfered to their respective components.
+
+<h2>Video</h2>
+
+https://youtu.be/24SUZ1ruFdw 
